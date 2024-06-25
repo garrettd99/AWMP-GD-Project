@@ -9,10 +9,17 @@
             font-family: Arial, sans-serif;
             margin: 20px;
             padding: 0;
-            color: #333;
+            color: #f0f0f0;
+            background-color: #121212;
         }
-        h1 {
-            color: #0056b3;
+        h1, h2 {
+            color: #1e90ff;
+        }
+        p, li {
+            color: #d3d3d3;
+        }
+        .search-container {
+            margin-bottom: 20px;
         }
         .book-list {
             margin: 0;
@@ -22,31 +29,58 @@
         .book-list li {
             margin-bottom: 10px;
         }
+        .book-item {
+            padding: 10px;
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 5px;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <h1>Milestone 1: Data Validation and Display</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search books by title..." style="width: 100%; padding: 10px; font-size: 16px;">
+    </div>
+    
     <ul class="book-list" id="book-list"></ul>
 
     <script>
         $(document).ready(function() {
-            $.getJSON('json-files/google-books-search.json', function(data) {
-                var books = data.items;
+            function displayBooks(books) {
                 var bookList = $('#book-list');
+                bookList.empty();
                 $.each(books, function(index, book) {
-                    var title = book.volumeInfo.title;
-                    var authors = book.volumeInfo.authors.join(', ');
-                    var description = book.volumeInfo.description;
+                    var title = book.volumeInfo.title || 'No title available';
+                    var authors = book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Unknown Author';
+                    var description = book.volumeInfo.description || 'No description available';
 
                     var bookItem = `
-                        <li>
+                        <li class="book-item">
                             <h2>${title}</h2>
                             <p><strong>Authors:</strong> ${authors}</p>
                             <p>${description}</p>
                         </li>
                     `;
                     bookList.append(bookItem);
+                });
+            }
+
+            $.getJSON('json-files/google-books-search.json', function(data) {
+                var books = data.items;
+
+                // Display all books initially
+                displayBooks(books);
+
+                // Filter books based on search input
+                $('#search').on('keyup', function() {
+                    var searchText = $(this).val().toLowerCase();
+                    var filteredBooks = books.filter(function(book) {
+                        return book.volumeInfo.title.toLowerCase().includes(searchText);
+                    });
+                    displayBooks(filteredBooks);
                 });
             });
         });
