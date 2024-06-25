@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milestone 1: Data Validation and Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            color: #333;
+        }
+        h1 {
+            color: #0056b3;
+        }
+        .book-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .book-list li {
+            margin-bottom: 10px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Milestone 1: Data Validation and Display</h1>
+    <ul class="book-list" id="book-list"></ul>
+
+    <script>
+        $(document).ready(function() {
+            $.getJSON('json/google-books-search.json', function(data) {
+                var books = data.items;
+                var bookList = $('#book-list');
+                $.each(books, function(index, book) {
+                    var title = book.volumeInfo.title;
+                    var authors = book.volumeInfo.authors.join(', ');
+                    var description = book.volumeInfo.description;
+
+                    var bookItem = `
+                        <li>
+                            <h2>${title}</h2>
+                            <p><strong>Authors:</strong> ${authors}</p>
+                            <p>${description}</p>
+                        </li>
+                    `;
+                    bookList.append(bookItem);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
