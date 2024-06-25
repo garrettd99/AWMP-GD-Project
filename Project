@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Search and Display SPA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            color: #333;
+        }
+        h1, h2 {
+            color: #0056b3;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .content-section {
+            margin-bottom: 20px;
+        }
+        .milestones ul {
+            list-style: none;
+            padding: 0;
+        }
+        .milestones ul li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Book Search and Display SPA</h1>
+            <p><strong>Name:</strong> [Your Name]</p>
+            <p><strong>Affiliation:</strong> [Your Affiliation]</p>
+            <p><strong>Course Information:</strong> <a href="http://ccse.kennesaw.edu/it">Kennesaw State University - IT Department</a></p>
+        </header>
+        
+        <div class="content-section">
+            <h2>Project Overview</h2>
+            <p>This project aims to create a single-page application (SPA) that allows users to search and display details of books using data provided by the Google Books API. The application will be built using JavaScript/jQuery and will feature a clean and organized interface to present book information effectively.</p>
+        </div>
+        
+        <div class="content-section milestones">
+            <h2>Project Milestones</h2>
+            <ul>
+                <li><a href="milestone1.html">Milestone 1: Data Validation and Display</a></li>
+                <li><a href="milestone2.html">Milestone 2: Search Functionality Implementation</a></li>
+                <li><a href="milestone3.html">Milestone 3: Single Book Detail Page</a></li>
+                <li><a href="milestone4.html">Milestone 4: Final Integration and Testing</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
