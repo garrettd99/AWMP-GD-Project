@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWMA Individual Project</title>
+    <title>Book Search Application</title>
     <style>
+        /* Styling for the body, headers, and description text */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -12,51 +13,52 @@
             color: #f0f0f0;
             background-color: #121212;
         }
-        h1, h2, a {
+        h1, h2 {
             color: #1e90ff;
         }
         p, li {
             color: #d3d3d3;
         }
-        .container {
+        .content {
             max-width: 800px;
-            margin: 0 auto;
+            margin: auto;
         }
-        .content-section {
-            margin-bottom: 20px;
+        ul {
+            padding-left: 20px;
         }
-        .milestones ul {
-            list-style: none;
-            padding: 0;
+        a {
+            color: #1e90ff;
+            text-decoration: none;
         }
-        .milestones ul li {
-            margin-bottom: 10px;
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Book Search and Display</h1>
-            <p><strong>Name:</strong> Garrett Davis</p>
-            <p><strong>Affiliation:</strong> Kennesaw State University</p>
-            <p><strong>Course Information:</strong> <a href="http://ccse.kennesaw.edu/it">Kennesaw State University - IT Department</a></p>
-        </header>
-        
-        <div class="content-section">
-            <h2>Project Overview</h2>
-            <p>This project aims to create a single-page application that allows users to search and display details of books using data provided by Google Books API. </p>
-        </div>
-        
-        <div class="content-section milestones">
-            <h2>Project Milestones</h2>
-            <ul>
-                <li><a href="M1.html">Milestone 1</a></li>
-                <li><a href="M2.html">Milestone 2</a></li>
-                <li><a href="M3.html">Milestone 3</a></li>
-                <li><a href="M4.html">Milestone 4</a></li>
-            </ul>
-        </div>
+    <div class="content">
+        <!-- Title and author details -->
+        <h1>Book Search</h1>
+        <p><strong>Author:</strong> Garrett Davis</p>
+        <p><strong>Affiliation:</strong> Kennesaw State University</p>
+
+        <!-- Site description -->
+        <p>Welcome to the Book Search Application. This project allows users to search for and view details of books using the Google Books API.</p>
+
+        <!-- Course information with link -->
+        <h2>Course Information</h2>
+        <p>For more information, visit the <a href="http://ccse.kennesaw.edu/it" target="_blank">Kennesaw State University IT Department</a>.</p>
+
+        <!-- Project information and table of contents for milestones -->
+        <h2>Project Information</h2>
+        <p>This project is divided into the following milestones:</p>
+        <ul>
+            <!-- Links to milestone pages -->
+            <li><a href="milestone1.html">Milestone 1: Data Validation and Display</a></li>
+            <li>Milestone 2: To Be Implemented</li>
+            <li>Milestone 3: To Be Implemented</li>
+            <li>Milestone 4: To Be Implemented</li>
+        </ul>
     </div>
 </body>
 </html>
