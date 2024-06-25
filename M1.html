@@ -35,6 +35,15 @@
             border: 1px solid #333;
             border-radius: 5px;
         }
+        .book-item img {
+            max-width: 100px;
+            margin-right: 10px;
+        }
+        .book-info {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -56,12 +65,20 @@
                     var title = book.volumeInfo.title || 'No title available';
                     var authors = book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Unknown Author';
                     var description = book.volumeInfo.description || 'No description available';
+                    var thumbnail = book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.thumbnail : '';
+                    var infoLink = book.volumeInfo.infoLink || '#';
 
                     var bookItem = `
                         <li class="book-item">
-                            <h2>${title}</h2>
-                            <p><strong>Authors:</strong> ${authors}</p>
-                            <p>${description}</p>
+                            <div class="book-info">
+                                ${thumbnail ? `<img src="${thumbnail}" alt="${title}">` : ''}
+                                <div>
+                                    <h2>${title}</h2>
+                                    <p><strong>Authors:</strong> ${authors}</p>
+                                    <p>${description}</p>
+                                    <p><a href="${infoLink}" target="_blank" style="color: #1e90ff;">More Info</a></p>
+                                </div>
+                            </div>
                         </li>
                     `;
                     bookList.append(bookItem);
