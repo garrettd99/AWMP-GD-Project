@@ -31,7 +31,7 @@
 
     <script>
         $(document).ready(function() {
-            $.getJSON('json/google-books-search.json', function(data) {
+            $.getJSON('json-files/google-books-search.json', function(data) {
                 var books = data.items;
                 var bookList = $('#book-list');
                 $.each(books, function(index, book) {
