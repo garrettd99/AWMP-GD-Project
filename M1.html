@@ -14,7 +14,7 @@
             background-color: #121212;
         }
         h1, h2 {
-            color: #1e90ff;
+            color: #2e8b57;
         }
         p, li {
             color: #d3d3d3;
@@ -33,7 +33,7 @@
         .book-item {
             padding: 10px;
             background-color: #1e1e1e;
-            border: 1px solid #333;
+            border: 1px solid #2e8b57;
             border-radius: 5px;
         }
         .book-item img {
@@ -44,6 +44,13 @@
             display: flex;
             flex-direction: row;
             align-items: center;
+        }
+        a {
+            color: #2e8b57;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
     <!-- jQuery library inclusion -->
@@ -83,7 +90,7 @@
                                     <h2>${title}</h2>
                                     <p><strong>Authors:</strong> ${authors}</p>
                                     <p>${description}</p>
-                                    <p><a href="${infoLink}" target="_blank" style="color: #1e90ff;">More Info</a></p>
+                                    <p><a href="${infoLink}" target="_blank">More Info</a></p>
                                 </div>
                             </div>
                         </li>
