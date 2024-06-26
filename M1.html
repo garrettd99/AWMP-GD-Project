@@ -53,28 +53,28 @@
             text-decoration: underline;
         }
     </style>
-    /* jQuery library inclusion */
+    // jQuery library inclusion
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    /* Page header */
+    // Page header
     <h1>Milestone 1</h1>
     
-    /* Search container for book title search */
+    // Search container for book title search
     <div class="search-container">
         <input type="text" id="search" placeholder="Search books by title..." style="width: 100%; padding: 10px; font-size: 16px;">
     </div>
     
-    /* Container for displaying book list */
+    // Container for displaying book list
     <ul class="book-list" id="book-list"></ul>
 
     <script>
         $(document).ready(function() {
-            /* Function to display books on the webpage */
+            // Function to display books on the webpage
             function displayBooks(books) {
                 var bookList = $('#book-list');
                 bookList.empty();
-                /* Loop through each book and create HTML structure to display it */
+                // Loop through each book and create HTML structure to display it
                 $.each(books, function(index, book) {
                     var title = book.volumeInfo.title || 'No title available';
                     var authors = book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Unknown Author';
@@ -99,14 +99,14 @@
                 });
             }
 
-            /* Fetch book data from JSON file and display it */
+            // Fetch book data from JSON file and display it
             $.getJSON('google-books-search.json', function(data) {
                 var books = data.items;
 
-                /* Display all books initially */
+                // Display all books initially
                 displayBooks(books);
 
-                /* Filter books based on search input */
+                // Filter books based on search input
                 $('#search').on('keyup', function() {
                     var searchText = $(this).val().toLowerCase();
                     var filteredBooks = books.filter(function(book) {
