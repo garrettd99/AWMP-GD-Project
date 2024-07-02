@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milestone 2 - Book Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            color: #f0f0f0;
+            background-color: #1a1a1a;
+        }
+        h1, h2 {
+            color: #ffd700; /* Hufflepuff yellow */
+        }
+        p, li {
+            color: #d3d3d3;
+        }
+        .content-section {
+            max-width: 800px;
+            margin: auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .header a {
+            color: #ffd700; /* Hufflepuff yellow */
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #333;
+            border-radius: 5px;
+        }
+        .header a:hover {
+            background-color: #444;
+        }
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .book-list {
+            list-style: none;
+            padding: 0;
+        }
+        .book-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 5px;
+        }
+        .book-item h3 {
+            margin: 0 0 10px;
+            color: #ffd700; /* Hufflepuff yellow */
+        }
+        .book-item img {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .paging-controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .paging-controls button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: #ffd700; /* Hufflepuff yellow */
+            border: none;
+            color: #1a1a1a; /* Dark background */
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .paging-controls button:hover {
+            background-color: #e6b800; /* Slightly darker yellow */
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function fetchBooks(query, callback) {
+                const url = `https://www.googleapis.com/books/v1/volumes?q=${query}`;
+                $.getJSON(url, function(data) {
+                    callback(data.items);
+                });
+            }
+
+            function fetchBookDetails(bookId, callback) {
+                const url = `https://www.googleapis.com/books/v1/volumes/${bookId}`;
+                $.getJSON(url, function(data) {
+                    callback(data);
+                });
+            }
+
+            function fetchBookshelf(callback) {
+                const url = `https://www.googleapis.com/books/v1/mylibrary/bookshelves/0/volumes`;
+                $.getJSON(url, function(data) {
+                    callback(data.items);
+                });
+            }
+
+            function displayBooks(books, container) {
+                $(container).empty();
+                books.forEach(book => {
+                    const bookHtml = `
+                        <li class="book-item">
+                            <img src="${book.volumeInfo.imageLinks?.thumbnail}" alt="${book.volumeInfo.title}">
+                            <div>
+                                <h3><a href="#" class="book-title" data-book-id="${book.id}">${book.volumeInfo.title}</a></h3>
+                                <p>${book.volumeInfo.authors?.join(', ')}</p>
+                            </div>
+                        </li>`;
+                    $(container).append(bookHtml);
+                });
+
+                $(".book-title").click(function(e) {
+                    e.preventDefault();
+                    const bookId = $(this).data("book-id");
+                    fetchBookDetails(bookId, displayBookDetails);
+                });
+            }
+
+            function displayBookDetails(book) {
+                $("#search-section").hide();
+                $("#bookshelf-section").hide();
+                $("#book-details-section").show();
+                const detailsHtml = `
+                    <h2>${book.volumeInfo.title}</h2>
+                    <img src="${book.volumeInfo.imageLinks?.thumbnail}" alt="${book.volumeInfo.title}">
+                    <p><strong>Authors:</strong> ${book.volumeInfo.authors?.join(', ')}</p>
+                    <p><strong>Publisher:</strong> ${book.volumeInfo.publisher}</p>
+                    <p><strong>Published Date:</strong> ${book.volumeInfo.publishedDate}</p>
+                    <p><strong>Description:</strong> ${book.volumeInfo.description}</p>`;
+                $("#book-details").html(detailsHtml);
+            }
+
+            $("#search-btn").click(function() {
+                const query = $("#search").val();
+                fetchBooks(query, function(books) {
+                    displayBooks(books, "#book-list");
+                    $("#search-section").show();
+                    $("#book-details-section").hide();
+                    $("#bookshelf-section").hide();
+                });
+            });
+
+            $("#back-to-search").click(function() {
+                $("#search-section").show();
+                $("#book-details-section").hide();
+            });
+
+            $("#bookshelf-link").click(function(e) {
+                e.preventDefault();
+                fetchBookshelf(function(books) {
+                    displayBooks(books, "#bookshelf-list");
+                    $("#search-section").hide();
+                    $("#book-details-section").hide();
+                    $("#bookshelf-section").show();
+                });
+            });
+
+            $("#home-link").click(function(e) {
+                e.preventDefault();
+                $("#search-section").show();
+                $("#book-details-section").hide();
+                $("#bookshelf-section").hide();
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html">Home</a>
+        <a href="#" id="home-link">Book Search</a>
+        <a href="#" id="bookshelf-link">My Bookshelf</a>
+    </div>
+    <h1>Milestone 2: Book Search Application</h1>
+    
+    <!-- Search Section -->
+    <div id="search-section" class="content-section active">
+        <h2>Book Search</h2>
+        <div class="search-container">
+            <input type="text" id="search" placeholder="Search books by title..." style="width: 80%; padding: 10px; font-size: 16px;">
+            <button id="search-btn" style="padding: 10px 20px; font-size: 16px;">Search</button>
+        </div>
+        <ul class="book-list" id="book-list"></ul>
+        <div class="paging-controls"></div>
+    </div>
+
+    <!-- Book Details Section -->
+    <div id="book-details-section" class="content-section" style="display:none;">
+        <h2>Book Details</h2>
+        <div id="book-details"></div>
+        <button id="back-to-search">Back to Search Results</button>
+    </div>
+
+    <!-- Bookshelf Section -->
+    <div id="bookshelf-section" class="content-section" style="display:none;">
+        <h2>My Bookshelf</h2>
+        <ul class="book-list" id="bookshelf-list"></ul>
+    </div>
+</body>
+</html>
