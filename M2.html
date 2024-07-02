@@ -5,134 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Milestone 2 - Book Search</title>
     <style>
-        /* General styling for the body */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
             padding: 0;
-            color: #f0f0f0; /* Text color */
-            background-color: #1a1a1a; /* Dark background color */
+            color: #f0f0f0;
+            background-color: #1a1a1a;
         }
-
-        /* Styling for the main headings */
         h1, h2 {
-            color: #ffd700; /* Hufflepuff Yellow */
+            color: #ffd700; /* Hufflepuff yellow */
         }
-
-        /* Styling for text and list items */
         p, li {
-            color: #d3d3d3; /* Light grey text color */
+            color: #d3d3d3;
         }
-
-        /* Main content section styling */
         .content-section {
             max-width: 800px;
             margin: auto;
-            padding: 20px;
-            background-color: #333; /* Dark background for content */
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-
-        /* Header section styling */
         .header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
         }
-
-        /* Styling for header links */
         .header a {
-            color: #ffd700; /* Hufflepuff Yellow */
+            color: #ffd700; /* Hufflepuff yellow */
             text-decoration: none;
             padding: 10px 20px;
-            background-color: #333; /* Dark background for links */
+            background-color: #333;
             border-radius: 5px;
         }
-
-        /* Header link hover effect */
         .header a:hover {
-            background-color: #444; /* Slightly lighter dark background */
+            background-color: #444;
         }
-
-        /* Search container styling */
         .search-container {
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
         }
-
-        /* Search input field styling */
-        .search-container input[type="text"] {
-            width: 80%;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 2px solid #ffd700; /* Hufflepuff Yellow border */
-        }
-
-        /* Search button styling */
-        .search-container button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #ffd700; /* Hufflepuff Yellow */
-            border: none;
-            color: #1a1a1a; /* Dark text color */
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        /* Search button hover effect */
-        .search-container button:hover {
-            background-color: #e6b800; /* Slightly darker yellow */
-        }
-
-        /* Book list styling */
         .book-list {
             list-style: none;
             padding: 0;
         }
-
-        /* Individual book item styling */
         .book-item {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
             padding: 10px;
-            background-color: #444; /* Darker background for book items */
+            background-color: #333;
             border-radius: 5px;
         }
-
-        /* Book title styling */
         .book-item h3 {
             margin: 0 0 10px;
-            color: #ffd700; /* Hufflepuff Yellow */
+            color: #ffd700; /* Hufflepuff yellow */
         }
-
-        /* Book cover image styling */
         .book-item img {
             max-width: 100px;
             margin-right: 20px;
         }
-
-        /* Paging controls section styling */
         .paging-controls {
             margin-top: 20px;
             text-align: center;
         }
-
-        /* Paging controls button styling */
         .paging-controls button {
             margin: 0 5px;
             padding: 5px 10px;
-            background-color: #ffd700; /* Hufflepuff Yellow */
+            background-color: #ffd700; /* Hufflepuff yellow */
             border: none;
-            color: #1a1a1a; /* Dark text color */
+            color: #1a1a1a; /* Dark background */
             border-radius: 3px;
             cursor: pointer;
         }
-
-        /* Paging controls button hover effect */
         .paging-controls button:hover {
             background-color: #e6b800; /* Slightly darker yellow */
         }
@@ -140,7 +82,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            /* Fetch books based on the search query */
             function fetchBooks(query, callback) {
                 const url = `https://www.googleapis.com/books/v1/volumes?q=${query}`;
                 $.getJSON(url, function(data) {
@@ -148,7 +89,6 @@
                 });
             }
 
-            /* Fetch details for a specific book */
             function fetchBookDetails(bookId, callback) {
                 const url = `https://www.googleapis.com/books/v1/volumes/${bookId}`;
                 $.getJSON(url, function(data) {
@@ -156,7 +96,6 @@
                 });
             }
 
-            /* Fetch the user's public bookshelf */
             function fetchBookshelf(callback) {
                 const publicBookshelfId = '0';
                 const url = `https://www.googleapis.com/books/v1/users/107187757107893839299/bookshelves/${publicBookshelfId}/volumes`;
@@ -165,7 +104,6 @@
                 });
             }
 
-            /* Display a list of books */
             function displayBooks(books, container) {
                 $(container).empty();
                 books.forEach(book => {
@@ -180,7 +118,6 @@
                     $(container).append(bookHtml);
                 });
 
-                /* Add click event to book titles to fetch and display details */
                 $(".book-title").click(function(e) {
                     e.preventDefault();
                     const bookId = $(this).data("book-id");
@@ -188,7 +125,6 @@
                 });
             }
 
-            /* Display details for a specific book */
             function displayBookDetails(book) {
                 $("#search-section").hide();
                 $("#bookshelf-section").hide();
@@ -203,7 +139,6 @@
                 $("#book-details").html(detailsHtml);
             }
 
-            /* Handle search button click event */
             $("#search-btn").click(function() {
                 const query = $("#search").val();
                 fetchBooks(query, function(books) {
@@ -214,13 +149,11 @@
                 });
             });
 
-            /* Handle back to search button click event */
             $("#back-to-search").click(function() {
                 $("#search-section").show();
                 $("#book-details-section").hide();
             });
 
-            /* Handle bookshelf link click event */
             $("#bookshelf-link").click(function(e) {
                 e.preventDefault();
                 fetchBookshelf(function(books) {
@@ -231,7 +164,6 @@
                 });
             });
 
-            /* Handle home link click event */
             $("#home-link").click(function(e) {
                 e.preventDefault();
                 $("#search-section").show();
@@ -242,13 +174,11 @@
     </script>
 </head>
 <body>
-    <!-- Header with navigation links -->
     <div class="header">
-        <a href="index.html">Home</a> <!-- Link to the home page -->
-        <a href="#" id="home-link">Book Search</a> <!-- Link to the Book Search section -->
-        <a href="#" id="bookshelf-link">My Bookshelf</a> <!-- Link to the Bookshelf section -->
+        <a href="index.html">Home</a>
+        <a href="#" id="home-link">Book Search</a>
+        <a href="#" id="bookshelf-link">My Bookshelf</a>
     </div>
-    
     <h1>Milestone 2: Book Search Application</h1>
     
     <!-- Search Section -->
@@ -258,7 +188,8 @@
             <input type="text" id="search" placeholder="Search books by title..." style="width: 80%; padding: 10px; font-size: 16px;">
             <button id="search-btn" style="padding: 10px 20px; font-size: 16px;">Search</button>
         </div>
-                <div class="paging-controls"></div>
+        <ul class="book-list" id="book-list"></ul>
+        <div class="paging-controls"></div>
     </div>
 
     <!-- Book Details Section -->
@@ -275,6 +206,3 @@
     </div>
 </body>
 </html>
-        <ul class="book-list" id="book-list"></ul>
-        <div class="paging-controls"></div> <!-- Placeholder for pagination controls -->
-    </
