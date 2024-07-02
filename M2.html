@@ -97,7 +97,8 @@
             }
 
             function fetchBookshelf(callback) {
-                const url = `https://www.googleapis.com/books/v1/mylibrary/bookshelves/0/volumes`;
+                const publicBookshelfId = 'YOUR_PUBLIC_BOOKSHELF_ID'; // Replace with your public bookshelf ID
+                const url = `https://www.googleapis.com/books/v1/users/YOUR_USER_ID/bookshelves/${publicBookshelfId}/volumes`; // Replace YOUR_USER_ID with your Google Books user ID
                 $.getJSON(url, function(data) {
                     callback(data.items);
                 });
