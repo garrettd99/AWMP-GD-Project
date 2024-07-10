@@ -102,7 +102,6 @@
             let totalItems = 0;
             const itemsPerPage = 10;
 
-            // Fetch books with pagination
             function fetchBooks(query, startIndex, callback) {
                 const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=${itemsPerPage}`;
                 $.getJSON(url, function(data) {
@@ -111,7 +110,6 @@
                 });
             }
 
-            // Fetch details of a specific book
             function fetchBookDetails(bookId, callback) {
                 const url = `https://www.googleapis.com/books/v1/volumes/${bookId}`;
                 $.getJSON(url, function(data) {
@@ -119,7 +117,6 @@
                 });
             }
 
-            // Fetch the user's bookshelf
             function fetchBookshelf(callback) {
                 const url = `https://www.googleapis.com/books/v1/mylibrary/bookshelves/0/volumes`;
                 $.getJSON(url, function(data) {
@@ -127,7 +124,6 @@
                 });
             }
 
-            // Display list of books
             function displayBooks(books, container) {
                 $(container).empty();
                 books.forEach(book => {
@@ -149,7 +145,6 @@
                 });
             }
 
-            // Display details of a selected book
             function displayBookDetails(book) {
                 $("#search-section").hide();
                 $("#bookshelf-section").hide();
@@ -164,28 +159,43 @@
                 $("#book-details").html(detailsHtml);
             }
 
-            // Update the pagination controls
             function updatePagination() {
                 const totalPages = Math.ceil(totalItems / itemsPerPage);
                 $(".paging-controls").empty();
-                
-                // Display the first 5 pages or fewer if there are less than 5 pages
-                for (let i = 1; i <= Math.min(5, totalPages); i++) {
+
+                // Display "Previous" button
+                if (currentPage > 1) {
+                    $(".paging-controls").append('<button class="prev-page">Previous</button>');
+                }
+
+                // Calculate range for pages to display
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (startPage > 1) {
+                    $(".paging-controls").append('<a href="#" class="page-link" data-page="1">1</a>');
+                    if (startPage > 2) {
+                        $(".paging-controls").append('<span>...</span>');
+                    }
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
                     const pageLink = `<a href="#" class="page-link" data-page="${i}">${i}</a>`;
                     $(".paging-controls").append(pageLink);
                 }
 
-                // Add "..." if there are more pages
-                if (totalPages > 5) {
-                    $(".paging-controls").append(`<span>...</span>`);
-                    const lastPageLink = `<a href="#" class="page-link" data-page="${totalPages}">${totalPages}</a>`;
-                    $(".paging-controls").append(lastPageLink);
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        $(".paging-controls").append('<span>...</span>');
+                    }
+                    $(".paging-controls").append(`<a href="#" class="page-link" data-page="${totalPages}">${totalPages}</a>`);
                 }
 
-                // Highlight the current page
-                $(`.page-link[data-page=${currentPage}]`).addClass('active-page');
+                // Display "Next" button
+                if (currentPage < totalPages) {
+                    $(".paging-controls").append('<button class="next-page">Next</button>');
+                }
 
-                // Page link click handler
                 $(".page-link").click(function(e) {
                     e.preventDefault();
                     currentPage = $(this).data("page");
@@ -195,9 +205,33 @@
                         updatePagination();
                     });
                 });
+
+                $(".prev-page").click(function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        const query = $("#search").val();
+                        fetchBooks(query, (currentPage - 1) * itemsPerPage, function(books) {
+                            displayBooks(books, "#book-list");
+                            updatePagination();
+                        });
+                    }
+                });
+
+                $(".next-page").click(function() {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        const query = $("#search").val();
+                        fetchBooks(query, (currentPage - 1) * itemsPerPage, function(books) {
+                            displayBooks(books, "#book-list");
+                            updatePagination();
+                        });
+                    }
+                });
+
+                // Highlight the current page
+                $(`.page-link[data-page=${currentPage}]`).addClass('active-page');
             }
 
-            // Search button click handler
             $("#search-btn").click(function() {
                 const query = $("#search").val();
                 fetchBooks(query, 0, function(books) {
@@ -210,13 +244,11 @@
                 });
             });
 
-            // Back to search results button click handler
             $("#back-to-search").click(function() {
                 $("#search-section").show();
                 $("#book-details-section").hide();
             });
 
-            // Bookshelf link click handler
             $("#bookshelf-link").click(function(e) {
                 e.preventDefault();
                 fetchBookshelf(function(books) {
@@ -227,7 +259,6 @@
                 });
             });
 
-            // Home link click handler
             $("#home-link").click(function(e) {
                 e.preventDefault();
                 $("#search-section").show();
