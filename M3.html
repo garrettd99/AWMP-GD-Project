@@ -109,7 +109,8 @@
                 const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=${itemsPerPage}`;
                 $.getJSON(url, function(data) {
                     totalItems = data.totalItems;
-                    callback(data.items);
+                    const totalPages = Math.ceil(totalItems / itemsPerPage);
+                    callback(data.items, totalPages);
                 });
             }
 
@@ -162,8 +163,7 @@
                 $("#book-details").html(detailsHtml);
             }
 
-            function updatePagination() {
-                const totalPages = Math.ceil(totalItems / itemsPerPage);
+            function updatePagination(totalPages) {
                 $(".paging-controls").empty();
 
                 // Display "Previous" button
@@ -205,7 +205,7 @@
                     const query = $("#search").val();
                     fetchBooks(query, (currentPage - 1) * itemsPerPage, function(books) {
                         displayBooks(books, "#book-list");
-                        updatePagination();
+                        updatePagination(Math.ceil(totalItems / itemsPerPage));
                     });
                 });
 
@@ -215,7 +215,7 @@
                         const query = $("#search").val();
                         fetchBooks(query, (currentPage - 1) * itemsPerPage, function(books) {
                             displayBooks(books, "#book-list");
-                            updatePagination();
+                            updatePagination(Math.ceil(totalItems / itemsPerPage));
                         });
                     }
                 });
@@ -226,7 +226,7 @@
                         const query = $("#search").val();
                         fetchBooks(query, (currentPage - 1) * itemsPerPage, function(books) {
                             displayBooks(books, "#book-list");
-                            updatePagination();
+                            updatePagination(Math.ceil(totalItems / itemsPerPage));
                         });
                     }
                 });
@@ -237,10 +237,10 @@
 
             $("#search-btn").click(function() {
                 const query = $("#search").val();
-                fetchBooks(query, 0, function(books) {
+                fetchBooks(query, 0, function(books, totalPages) {
                     displayBooks(books, "#book-list");
                     currentPage = 1;
-                    updatePagination();
+                    updatePagination(totalPages);
                     $("#search-section").show();
                     $("#book-details-section").hide();
                     $("#bookshelf-section").hide();
@@ -278,7 +278,7 @@
                     const query = $("#search").val();
                     fetchBooks(query, (currentPage - 1) * itemsPerPage, function(books) {
                         displayBooks(books, "#book-list");
-                        updatePagination();
+                        updatePagination(Math.ceil(totalItems / itemsPerPage));
                     });
                 }
             });
