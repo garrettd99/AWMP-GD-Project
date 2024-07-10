@@ -94,6 +94,9 @@
             background-color: #d40000; /* Gryffindor red */
             color: #1a1a1a;
         }
+        .paging-controls .ellipses {
+            color: #d3d3d3;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -175,7 +178,7 @@
                 if (startPage > 1) {
                     $(".paging-controls").append('<a href="#" class="page-link" data-page="1">1</a>');
                     if (startPage > 2) {
-                        $(".paging-controls").append('<span>...</span>');
+                        $(".paging-controls").append('<span class="ellipses">...</span>');
                     }
                 }
 
@@ -186,7 +189,7 @@
 
                 if (endPage < totalPages) {
                     if (endPage < totalPages - 1) {
-                        $(".paging-controls").append('<span>...</span>');
+                        $(".paging-controls").append('<span class="ellipses">...</span>');
                     }
                     $(".paging-controls").append(`<a href="#" class="page-link" data-page="${totalPages}">${totalPages}</a>`);
                 }
