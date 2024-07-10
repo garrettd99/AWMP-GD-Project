@@ -106,7 +106,7 @@
             let totalPages = 0;
             const itemsPerPage = 10;
             let currentQuery = '';
-
+            
             function fetchBooks(query, startIndex, callback) {
                 const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=${itemsPerPage}`;
                 $.getJSON(url, function(data) {
@@ -127,7 +127,11 @@
             function fetchBookshelf(callback) {
                 const url = `https://www.googleapis.com/books/v1/mylibrary/bookshelves/0/volumes`;
                 $.getJSON(url, function(data) {
-                    callback(data.items);
+                    if (data.items) {
+                        callback(data.items);
+                    } else {
+                        $("#bookshelf-list").html("<p>No books found in the bookshelf.</p>");
+                    }
                 });
             }
 
