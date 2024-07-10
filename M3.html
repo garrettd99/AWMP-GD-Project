@@ -105,6 +105,7 @@
             let totalItems = 0;
             let totalPages = 0;
             const itemsPerPage = 10;
+            let currentQuery = '';
 
             function fetchBooks(query, startIndex, callback) {
                 const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=${itemsPerPage}`;
@@ -204,20 +205,16 @@
                 $(".page-link").click(function(e) {
                     e.preventDefault();
                     currentPage = $(this).data("page");
-                    const query = $("#search").val();
-                    fetchBooks(query, (currentPage - 1) * itemsPerPage, function(books) {
+                    fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
                         displayBooks(books, "#book-list");
-                        updatePagination();
                     });
                 });
 
                 $(".prev-page").click(function() {
                     if (currentPage > 1) {
                         currentPage--;
-                        const query = $("#search").val();
-                        fetchBooks(query, (currentPage - 1) * itemsPerPage, function(books) {
+                        fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
                             displayBooks(books, "#book-list");
-                            updatePagination();
                         });
                     }
                 });
@@ -225,10 +222,8 @@
                 $(".next-page").click(function() {
                     if (currentPage < totalPages) {
                         currentPage++;
-                        const query = $("#search").val();
-                        fetchBooks(query, (currentPage - 1) * itemsPerPage, function(books) {
+                        fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
                             displayBooks(books, "#book-list");
-                            updatePagination();
                         });
                     }
                 });
@@ -238,8 +233,8 @@
             }
 
             $("#search-btn").click(function() {
-                const query = $("#search").val();
-                fetchBooks(query, 0, function(books) {
+                currentQuery = $("#search").val();
+                fetchBooks(currentQuery, 0, function(books) {
                     displayBooks(books, "#book-list");
                     currentPage = 1;
                     updatePagination();
@@ -277,11 +272,11 @@
                 const pageNumber = parseInt(inputPage);
                 if (pageNumber && pageNumber >= 1 && pageNumber <= totalPages) {
                     currentPage = pageNumber;
-                    const query = $("#search").val();
-                    fetchBooks(query, (currentPage - 1) * itemsPerPage, function(books) {
+                    fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
                         displayBooks(books, "#book-list");
-                        updatePagination();
                     });
+                } else {
+                    alert("Invalid page number. Please enter a number between 1 and " + totalPages + ".");
                 }
             });
 
