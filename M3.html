@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Milestone 3 - Book Search</title>
     <style>
+        /* Gryffindor themed styles */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -78,19 +79,37 @@
         .paging-controls button:hover {
             background-color: #b30000; /* Slightly darker red */
         }
+        .paging-controls a {
+            color: #d40000; /* Gryffindor red */
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            background-color: #333;
+            margin: 0 5px;
+        }
+        .paging-controls a:hover {
+            background-color: #444;
+        }
+        .paging-controls .active-page {
+            background-color: #d40000; /* Gryffindor red */
+            color: #1a1a1a;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Function to fetch books based on search query
+            let currentPage = 1;
+            let totalItems = 0;
+            const itemsPerPage = 10;
+
             function fetchBooks(query, startIndex, callback) {
-                const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=10`;
+                const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=${itemsPerPage}`;
                 $.getJSON(url, function(data) {
+                    totalItems = data.totalItems;
                     callback(data.items);
                 });
             }
 
-            // Function to fetch book details by book ID
             function fetchBookDetails(bookId, callback) {
                 const url = `https://www.googleapis.com/books/v1/volumes/${bookId}`;
                 $.getJSON(url, function(data) {
@@ -98,7 +117,6 @@
                 });
             }
 
-            // Function to fetch books from a public bookshelf
             function fetchBookshelf(callback) {
                 const url = `https://www.googleapis.com/books/v1/mylibrary/bookshelves/0/volumes`;
                 $.getJSON(url, function(data) {
@@ -106,7 +124,6 @@
                 });
             }
 
-            // Function to display books in the list
             function displayBooks(books, container) {
                 $(container).empty();
                 books.forEach(book => {
@@ -121,7 +138,6 @@
                     $(container).append(bookHtml);
                 });
 
-                // Event handler for clicking on a book title to fetch details
                 $(".book-title").click(function(e) {
                     e.preventDefault();
                     const bookId = $(this).data("book-id");
@@ -129,7 +145,6 @@
                 });
             }
 
-            // Function to display book details
             function displayBookDetails(book) {
                 $("#search-section").hide();
                 $("#bookshelf-section").hide();
@@ -144,24 +159,42 @@
                 $("#book-details").html(detailsHtml);
             }
 
-            // Event handler for search button
+            function updatePagination() {
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                $(".paging-controls").empty();
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageLink = `<a href="#" class="page-link" data-page="${i}">${i}</a>`;
+                    $(".paging-controls").append(pageLink);
+                }
+                $(`.page-link[data-page=${currentPage}]`).addClass('active-page');
+                $(".page-link").click(function(e) {
+                    e.preventDefault();
+                    currentPage = $(this).data("page");
+                    const query = $("#search").val();
+                    fetchBooks(query, (currentPage - 1) * itemsPerPage, function(books) {
+                        displayBooks(books, "#book-list");
+                        updatePagination();
+                    });
+                });
+            }
+
             $("#search-btn").click(function() {
                 const query = $("#search").val();
                 fetchBooks(query, 0, function(books) {
                     displayBooks(books, "#book-list");
+                    currentPage = 1;
+                    updatePagination();
                     $("#search-section").show();
                     $("#book-details-section").hide();
                     $("#bookshelf-section").hide();
                 });
             });
 
-            // Event handler to go back to search results
             $("#back-to-search").click(function() {
                 $("#search-section").show();
                 $("#book-details-section").hide();
             });
 
-            // Event handler for bookshelf link
             $("#bookshelf-link").click(function(e) {
                 e.preventDefault();
                 fetchBookshelf(function(books) {
@@ -172,7 +205,6 @@
                 });
             });
 
-            // Event handler for home link
             $("#home-link").click(function(e) {
                 e.preventDefault();
                 $("#search-section").show();
@@ -198,10 +230,7 @@
             <!-- Search results list -->
             <ul id="book-list" class="book-list"></ul>
             <!-- Paging controls -->
-            <div class="paging-controls">
-                <button id="prev-page">Previous</button>
-                <button id="next-page">Next</button>
-            </div>
+            <div class="paging-controls"></div>
         </div>
         <div id="book-details-section" style="display: none;">
             <!-- Book details section -->
