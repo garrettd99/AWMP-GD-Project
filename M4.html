@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Milestone 4 - Book Search</title>
     <style>
-        /* Ravenclaw themed styles */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -20,7 +19,7 @@
             color: #d3d3d3;
         }
         .content-section {
-            max-width: 800px;
+            max-width: 1200px;
             margin: auto;
         }
         .header {
@@ -43,21 +42,11 @@
             justify-content: space-between;
             margin-bottom: 20px;
         }
-        .view-toggle button {
-            margin-left: 10px;
-            padding: 5px 10px;
-            background-color: #0e3a6f; /* Ravenclaw blue */
-            border: none;
-            color: #1a1a1a; /* Dark background */
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .view-toggle button:hover {
-            background-color: #072c5d; /* Slightly darker blue */
-        }
         .book-list {
             list-style: none;
             padding: 0;
+            display: flex;
+            flex-wrap: wrap;
         }
         .book-item {
             display: flex;
@@ -66,6 +55,8 @@
             padding: 10px;
             background-color: #333;
             border-radius: 5px;
+            width: calc(33.333% - 20px);
+            margin-right: 20px;
         }
         .book-item h3 {
             margin: 0 0 10px;
@@ -89,7 +80,7 @@
             cursor: pointer;
         }
         .paging-controls button:hover {
-            background-color: #072c5d; /* Slightly darker blue */
+            background-color: #0b2e53; /* Slightly darker blue */
         }
         .paging-controls a {
             color: #0e3a6f; /* Ravenclaw blue */
@@ -109,41 +100,49 @@
         .paging-controls .ellipses {
             color: #d3d3d3;
         }
-        .list-view .book-item {
-            flex-direction: row;
-        }
         .grid-view .book-item {
-            flex-direction: column;
-            align-items: flex-start;
+            width: calc(33.333% - 20px);
+        }
+        .list-view .book-item {
+            width: 100%;
+        }
+        .view-switcher {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        .view-switcher button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #0e3a6f; /* Ravenclaw blue */
+            border: none;
+            color: #1a1a1a; /* Dark background */
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .view-switcher button:hover {
+            background-color: #0b2e53; /* Slightly darker blue */
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mustache@4.2.0/mustache.min.js"></script>
-    <script>
-        const bookTemplate = `
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script>
+    <script id="book-template" type="x-tmpl-mustache">
         <li class="book-item">
             <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
             <div>
                 <h3><a href="#" class="book-title" data-book-id="{{id}}">{{volumeInfo.title}}</a></h3>
                 <p>{{volumeInfo.authors}}</p>
             </div>
-        </li>`;
-
-        const bookDetailsTemplate = `
-        <h2>{{volumeInfo.title}}</h2>
-        <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
-        <p><strong>Authors:</strong> {{volumeInfo.authors}}</p>
-        <p><strong>Publisher:</strong> {{volumeInfo.publisher}}</p>
-        <p><strong>Published Date:</strong> {{volumeInfo.publishedDate}}</p>
-        <p><strong>Description:</strong> {{volumeInfo.description}}</p>`;
-
+        </li>
+    </script>
+    <script>
         $(document).ready(function() {
             let currentPage = 1;
             let totalItems = 0;
             let totalPages = 0;
             const itemsPerPage = 10;
             let currentQuery = '';
-            let currentView = 'list'; // can be 'list' or 'grid'
+            let currentView = 'list-view'; // default view
 
             function fetchBooks(query, startIndex, callback) {
                 const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=${itemsPerPage}`;
@@ -176,8 +175,9 @@
             function displayBooks(books, container) {
                 $(container).empty();
                 books.forEach(book => {
-                    const bookHtml = Mustache.render(bookTemplate, book);
-                    $(container).append(bookHtml);
+                    const template = $('#book-template').html();
+                    const rendered = Mustache.render(template, book);
+                    $(container).append(rendered);
                 });
 
                 $(".book-title").click(function(e) {
@@ -191,7 +191,13 @@
                 $("#search-section").hide();
                 $("#bookshelf-section").hide();
                 $("#book-details-section").show();
-                const detailsHtml = Mustache.render(bookDetailsTemplate, book);
+                const detailsHtml = `
+                    <h2>${book.volumeInfo.title}</h2>
+                    <img src="${book.volumeInfo.imageLinks?.thumbnail}" alt="${book.volumeInfo.title}">
+                    <p><strong>Authors:</strong> ${book.volumeInfo.authors?.join(', ')}</p>
+                    <p><strong>Publisher:</strong> ${book.volumeInfo.publisher}</p>
+                    <p><strong>Published Date:</strong> ${book.volumeInfo.publishedDate}</p>
+                    <p><strong>Description:</strong> ${book.volumeInfo.description}</p>`;
                 $("#book-details").html(detailsHtml);
             }
 
@@ -253,80 +259,83 @@
                         });
                     }
                 });
+
+                $(`.page-link[data-page="${currentPage}"]`).addClass('active-page');
             }
 
-            $("#search-btn").click(function() {
-                currentQuery = $("#search").val();
+            $("#search-form").submit(function(e) {
+                e.preventDefault();
+                currentQuery = $("#search-input").val();
                 currentPage = 1;
                 fetchBooks(currentQuery, 0, function(books) {
                     displayBooks(books, "#book-list");
                 });
             });
 
-            $("#back-to-search").click(function() {
-                $("#book-details-section").hide();
-                $("#search-section").show();
+            $("#view-grid").click(function() {
+                currentView = 'grid-view';
+                $("#book-list").removeClass('list-view').addClass('grid-view');
             });
 
-            $("#home-link").click(function(e) {
-                e.preventDefault();
-                $("#book-details-section").hide();
-                $("#bookshelf-section").hide();
-                $("#search-section").show();
+            $("#view-list").click(function() {
+                currentView = 'list-view';
+                $("#book-list").removeClass('grid-view').addClass('list-view');
             });
 
-            $("#bookshelf-link").click(function(e) {
-                e.preventDefault();
-                $("#book-details-section").hide();
+            $("#view-bookshelf").click(function() {
                 $("#search-section").hide();
+                $("#book-details-section").hide();
                 $("#bookshelf-section").show();
                 fetchBookshelf(function(books) {
                     displayBooks(books, "#bookshelf-list");
                 });
             });
 
-            $("#list-view-btn").click(function() {
-                currentView = 'list';
-                $("#book-list, #bookshelf-list").removeClass("grid-view").addClass("list-view");
+            $("#view-search").click(function() {
+                $("#bookshelf-section").hide();
+                $("#book-details-section").hide();
+                $("#search-section").show();
             });
 
-            $("#grid-view-btn").click(function() {
-                currentView = 'grid';
-                $("#book-list, #bookshelf-list").removeClass("list-view").addClass("grid-view");
+            $("#back-to-results").click(function() {
+                $("#book-details-section").hide();
+                $("#search-section").show();
             });
+
+            // Initial load
+            $("#book-list").addClass(currentView);
         });
     </script>
 </head>
 <body>
-    <div class="header">
-        <a href="index.html">Home</a>
-        <a href="#" id="home-link">Book Search</a>
-        <a href="#" id="bookshelf-link">My Bookshelf</a>
-    </div>
     <div class="content-section">
-        <div id="search-section">
-            <!-- Search bar and button -->
-            <div class="search-container">
-                <input type="text" id="search" placeholder="Search for books...">
-                <button id="search-btn">Search</button>
-                <div class="view-toggle">
-                    <button id="list-view-btn">List View</button>
-                    <button id="grid-view-btn">Grid View</button>
-                </div>
+        <div class="header">
+            <h1>Milestone 4 - Book Search</h1>
+            <div>
+                <a href="index.html">Home</a>
             </div>
-            <!-- Search results list -->
-            <ul id="book-list" class="book-list list-view"></ul>
-            <!-- Paging controls -->
-            <div class="paging-controls"></div>
         </div>
-        <div id="book-details-section" style="display: none;">
-            <!-- Book details section -->
+        <div class="search-container" id="search-section">
+            <form id="search-form">
+                <input type="text" id="search-input" placeholder="Search for books...">
+                <button type="submit">Search</button>
+            </form>
+            <div class="view-switcher">
+                <button id="view-grid">Grid View</button>
+                <button id="view-list">List View</button>
+                <button id="view-bookshelf">View Bookshelf</button>
+            </div>
+        </div>
+        <ul id="book-list" class="book-list list-view"></ul>
+        <div class="paging-controls"></div>
+        <div id="bookshelf-section" style="display:none;">
+            <h2>Bookshelf</h2>
+            <ul id="bookshelf-list" class="book-list"></ul>
+            <button id="view-search">Back to Search</button>
+        </div>
+        <div id="book-details-section" style="display:none;">
+            <button id="back-to-results">Back to Results</button>
             <div id="book-details"></div>
-            <button id="back-to-search">Back to Search Results</button>
-        </div>
-        <div id="bookshelf-section" style="display: none;">
-            <!-- Bookshelf list -->
-            <ul id="bookshelf-list" class="book-list list-view"></ul>
         </div>
     </div>
 </body>
