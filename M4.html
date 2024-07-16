@@ -4,179 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Milestone 4 - Book Search</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-            color: #e0e0e0;
-            background-color: #1a1a1a;
-        }
-        h1, h2 {
-            color: #0e3a6f; /* Ravenclaw blue */
-        }
-        p, li {
-            color: #d3d3d3;
-        }
-        .content-section {
-            max-width: 1200px;
-            margin: auto;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .header a {
-            color: #0e3a6f; /* Ravenclaw blue */
-            text-decoration: none;
-            padding: 10px 20px;
-            background-color: #333;
-            border-radius: 5px;
-        }
-        .header a:hover {
-            background-color: #444;
-        }
-        .search-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .search-container form {
-            display: flex;
-            flex: 1;
-            max-width: 600px;
-            margin-bottom: 10px;
-        }
-        .search-container input {
-            padding: 10px;
-            margin-right: 10px;
-            border-radius: 5px;
-            border: 1px solid #555;
-            background-color: #333;
-            color: #e0e0e0;
-            flex: 1;
-        }
-        .search-container button {
-            padding: 10px 20px;
-            background-color: #0e3a6f; /* Ravenclaw blue */
-            border: none;
-            color: #1a1a1a; /* Dark background */
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .search-container button:hover {
-            background-color: #0b2e53; /* Slightly darker blue */
-        }
-        .view-switcher {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .view-switcher button {
-            margin-left: 10px;
-            padding: 5px 10px;
-            background-color: #0e3a6f; /* Ravenclaw blue */
-            border: none;
-            color: #1a1a1a; /* Dark background */
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .view-switcher button:hover {
-            background-color: #0b2e53; /* Slightly darker blue */
-        }
-        #box {
-            display: flex; 
-            flex-wrap: wrap;
-            width: 100%;
-        }
-        .boxitem {
-            border: thin solid blue;
-            background-color: #ffeecc;
-            margin: 0.3%;
-            display: flex;
-            align-items: center;
-            padding: 10px;
-        }
-        .boxitem img {
-            max-width: 50px;
-            margin-right: 10px;
-        }
-        .boxitem h3 {
-            margin: 0 0 5px;
-            color: #0e3a6f; /* Ravenclaw blue */
-        }
-        .boxitem p {
-            margin: 0;
-        }
-        .boxitem a {
-            color: #0e3a6f; /* Ravenclaw blue */
-            text-decoration: none;
-        }
-        .boxitem a:hover {
-            text-decoration: underline;
-        }
-        .paging-controls {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .paging-controls button {
-            margin: 0 5px;
-            padding: 5px 10px;
-            background-color: #0e3a6f; /* Ravenclaw blue */
-            border: none;
-            color: #1a1a1a; /* Dark background */
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .paging-controls button:hover {
-            background-color: #0b2e53; /* Slightly darker blue */
-        }
-        .paging-controls a {
-            color: #0e3a6f; /* Ravenclaw blue */
-            text-decoration: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            background-color: #333;
-            margin: 0 5px;
-        }
-        .paging-controls a:hover {
-            background-color: #444;
-        }
-        .paging-controls .active-page {
-            background-color: #0e3a6f; /* Ravenclaw blue */
-            color: #1a1a1a;
-        }
-        .paging-controls .ellipses {
-            color: #d3d3d3;
-        }
-        .grid-view .boxitem {
-            width: calc(24% - 0.6%);
-            height: 150px;
-        }
-        .list-view .boxitem {
-            width: 99%;
-            height: 80px;
-        }
-        #bookshelf-section {
-            display: none;
-        }
-        #book-details-section {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css"> <!-- Assuming you have a separate CSS file -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script>
-    <script id="book-template" type="x-tmpl-mustache">
-        <div class="boxitem">
-            <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
-            <div>
-                <h3><a href="#" class="book-title" data-book-id="{{id}}">{{volumeInfo.title}}</a></h3>
-                <p>{{volumeInfo.authors}}</p>
-            </div>
-        </div>
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script> <!-- Added Mustache.js -->
     <script>
         $(document).ready(function() {
             let currentPage = 1;
@@ -184,7 +14,39 @@
             let totalPages = 0;
             const itemsPerPage = 10;
             let currentQuery = '';
-            let currentView = 'list-view'; // default view
+            
+            const bookTemplate = `
+                {{#books}}
+                <div class="book-item">
+                    <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
+                    <div>
+                        <h3><a href="#" class="book-title" data-book-id="{{id}}">{{volumeInfo.title}}</a></h3>
+                        <p>{{volumeInfo.authors.join(', ')}}</p>
+                    </div>
+                </div>
+                {{/books}}
+            `;
+            
+            const bookDetailsTemplate = `
+                <h2>{{volumeInfo.title}}</h2>
+                <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
+                <p><strong>Authors:</strong> {{volumeInfo.authors.join(', ')}}</p>
+                <p><strong>Publisher:</strong> {{volumeInfo.publisher}}</p>
+                <p><strong>Published Date:</strong> {{volumeInfo.publishedDate}}</p>
+                <p><strong>Description:</strong> {{volumeInfo.description}}</p>
+            `;
+
+            const bookshelfTemplate = `
+                {{#books}}
+                <div class="book-item">
+                    <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
+                    <div>
+                        <h3><a href="#" class="book-title" data-book-id="{{id}}">{{volumeInfo.title}}</a></h3>
+                        <p>{{volumeInfo.authors.join(', ')}}</p>
+                    </div>
+                </div>
+                {{/books}}
+            `;
 
             function fetchBooks(query, startIndex, callback) {
                 const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=${itemsPerPage}`;
@@ -193,8 +55,6 @@
                     totalPages = Math.ceil(totalItems / itemsPerPage);
                     callback(data.items);
                     updatePagination();
-                }).fail(function() {
-                    alert('Failed to fetch books. Please try again.');
                 });
             }
 
@@ -202,8 +62,6 @@
                 const url = `https://www.googleapis.com/books/v1/volumes/${bookId}`;
                 $.getJSON(url, function(data) {
                     callback(data);
-                }).fail(function() {
-                    alert('Failed to fetch book details. Please try again.');
                 });
             }
 
@@ -215,18 +73,13 @@
                     } else {
                         $("#bookshelf-list").html("<p>No books found in the bookshelf.</p>");
                     }
-                }).fail(function() {
-                    alert('Failed to fetch bookshelf data. Please try again.');
                 });
             }
 
             function displayBooks(books, container) {
                 $(container).empty();
-                books.forEach(book => {
-                    const template = $('#book-template').html();
-                    const rendered = Mustache.render(template, book);
-                    $(container).append(rendered);
-                });
+                const html = Mustache.render(bookTemplate, { books });
+                $(container).html(html);
 
                 $(".book-title").click(function(e) {
                     e.preventDefault();
@@ -239,23 +92,19 @@
                 $("#search-section").hide();
                 $("#bookshelf-section").hide();
                 $("#book-details-section").show();
-                const detailsHtml = `
-                    <h2>${book.volumeInfo.title}</h2>
-                    <img src="${book.volumeInfo.imageLinks?.thumbnail}" alt="${book.volumeInfo.title}">
-                    <p><strong>Authors:</strong> ${book.volumeInfo.authors?.join(', ')}</p>
-                    <p><strong>Publisher:</strong> ${book.volumeInfo.publisher}</p>
-                    <p><strong>Published Date:</strong> ${book.volumeInfo.publishedDate}</p>
-                    <p><strong>Description:</strong> ${book.volumeInfo.description}</p>`;
+                const detailsHtml = Mustache.render(bookDetailsTemplate, book);
                 $("#book-details").html(detailsHtml);
             }
 
             function updatePagination() {
                 $(".paging-controls").empty();
 
+                // Display "Previous" button
                 if (currentPage > 1) {
                     $(".paging-controls").append('<button class="prev-page">Previous</button>');
                 }
 
+                // Display page numbers with ellipses
                 let startPage = Math.max(1, currentPage - 2);
                 let endPage = Math.min(totalPages, currentPage + 2);
 
@@ -267,11 +116,8 @@
                 }
 
                 for (let i = startPage; i <= endPage; i++) {
-                    if (i === currentPage) {
-                        $(".paging-controls").append(`<button class="page-link active-page" data-page="${i}">${i}</button>`);
-                    } else {
-                        $(".paging-controls").append(`<button class="page-link" data-page="${i}">${i}</button>`);
-                    }
+                    const pageLink = `<a href="#" class="page-link" data-page="${i}">${i}</a>`;
+                    $(".paging-controls").append(pageLink);
                 }
 
                 if (endPage < totalPages) {
@@ -281,14 +127,16 @@
                     $(".paging-controls").append(`<a href="#" class="page-link" data-page="${totalPages}">${totalPages}</a>`);
                 }
 
+                // Display "Next" button
                 if (currentPage < totalPages) {
                     $(".paging-controls").append('<button class="next-page">Next</button>');
                 }
 
-                $(".page-link").click(function() {
+                $(".page-link").click(function(e) {
+                    e.preventDefault();
                     currentPage = $(this).data("page");
                     fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
-                        displayBooks(books, "#box");
+                        displayBooks(books, "#book-list");
                     });
                 });
 
@@ -296,7 +144,7 @@
                     if (currentPage > 1) {
                         currentPage--;
                         fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
-                            displayBooks(books, "#box");
+                            displayBooks(books, "#book-list");
                         });
                     }
                 });
@@ -305,92 +153,221 @@
                     if (currentPage < totalPages) {
                         currentPage++;
                         fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
-                            displayBooks(books, "#box");
+                            displayBooks(books, "#book-list");
                         });
                     }
                 });
 
-                $(`.page-link[data-page="${currentPage}"]`).addClass('active-page');
+                // Highlight the current page
+                $(`.page-link[data-page=${currentPage}]`).addClass('active-page');
             }
 
-            $("#search-form").submit(function(e) {
-                e.preventDefault();
-                currentQuery = $("#search-input").val();
-                if (currentQuery) {
+            $("#search-btn").click(function() {
+                currentQuery = $("#search").val();
+                fetchBooks(currentQuery, 0, function(books) {
+                    displayBooks(books, "#book-list");
                     currentPage = 1;
-                    fetchBooks(currentQuery, 0, function(books) {
-                        displayBooks(books, "#box");
-                    });
-                } else {
-                    alert('Please enter a search query.');
-                }
-            });
-
-            $("#btnGrid").click(function () {
-                currentView = 'grid-view';
-                $("#box").removeClass('list-view').addClass('grid-view');
-            });
-
-            $("#btnList").click(function () {
-                currentView = 'list-view';
-                $("#box").removeClass('grid-view').addClass('list-view');
-            });
-
-            $("#view-bookshelf").click(function() {
-                $("#search-section").hide();
-                $("#book-details-section").hide();
-                $("#bookshelf-section").show();
-                fetchBookshelf(function(books) {
-                    displayBooks(books, "#bookshelf-list");
+                    updatePagination();
+                    $("#search-section").show();
+                    $("#book-details-section").hide();
+                    $("#bookshelf-section").hide();
                 });
             });
 
-            $("#view-search").click(function() {
+            $("#back-to-search").click(function() {
+                $("#search-section").show();
+                $("#book-details-section").hide();
+            });
+
+            $("#bookshelf-link").click(function(e) {
+                e.preventDefault();
+                fetchBookshelf(function(books) {
+                    const html = Mustache.render(bookshelfTemplate, { books });
+                    $("#bookshelf-list").html(html);
+                    $("#search-section").hide();
+                    $("#book-details-section").hide();
+                    $("#bookshelf-section").show();
+                });
+            });
+
+            $("#home-link").click(function(e) {
+                e.preventDefault();
+                $("#search-section").show();
+                $("#book-details-section").hide();
                 $("#bookshelf-section").hide();
-                $("#book-details-section").hide();
-                $("#search-section").show();
             });
 
-            $("#back-to-results").click(function() {
-                $("#book-details-section").hide();
-                $("#search-section").show();
+            // Search within the ellipses
+            $(document).on('click', '.ellipses', function() {
+                const inputPage = prompt("Enter a page number:");
+                const pageNumber = parseInt(inputPage);
+                if (pageNumber && pageNumber >= 1 && pageNumber <= totalPages) {
+                    currentPage = pageNumber;
+                    fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
+                        displayBooks(books, "#book-list");
+                    });
+                } else {
+                    alert("Invalid page number. Please enter a number between 1 and " + totalPages + ".");
+                }
             });
 
-            // Initial load
-            $("#box").addClass(currentView);
+            // Switch between grid and list views
+            $("#btnGrid").click(function() {
+                $(".book-item").css("width", "24%").css("height", "150px");
+                $("#box").attr("data-layout", "Grid");
+            });
+
+            $("#btnList").click(function() {
+                $(".book-item").css("width", "99%").css("height", "80px");
+                $("#box").attr("data-layout", "List");
+            });
+
         });
     </script>
+    <style>
+        /* Ravenclaw themed styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            color: #f0f0f0;
+            background-color: #003b70; /* Dark blue background */
+        }
+
+        h1 {
+            color: #f0f0f0;
+            border-bottom: 2px solid #0f4c81; /* Light blue underline */
+        }
+
+        #search-section, #book-details-section, #bookshelf-section {
+            display: none;
+        }
+
+        #search-section {
+            display: block;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            padding: 10px;
+            width: 300px;
+            border: 2px solid #0f4c81;
+            border-radius: 5px;
+        }
+
+        .search-container button {
+            padding: 10px 20px;
+            background-color: #0f4c81;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #0a2c61;
+        }
+
+        #book-list {
+            margin-top: 20px;
+        }
+
+        .book-item {
+            display: flex;
+            margin-bottom: 10px;
+            background-color: #0f4c81;
+            padding: 10px;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        .book-item img {
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+
+        #book-details-section {
+            margin-top: 20px;
+        }
+
+        #bookshelf-section {
+            margin-top: 20px;
+        }
+
+        #bookshelf-list .book-item {
+            background-color: #0056a0;
+        }
+
+        .paging-controls {
+            margin-top: 20px;
+        }
+
+        .page-link, .prev-page, .next-page {
+            padding: 5px 10px;
+            background-color: #0f4c81;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .page-link.active-page {
+            background-color: #003b70;
+        }
+
+        .ellipses {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #0f4c81;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .prev-page:hover, .next-page:hover {
+            background-color: #0a2c61;
+        }
+
+        /* Grid and List view styles */
+        #box {
+            display: flex;
+            flex-wrap: wrap;
+            border: 3px solid #0f4c81; /* Light blue border */
+            width: 100%;
+        }
+
+        #box[data-layout="Grid"] .book-item {
+            width: 24%;
+            height: 150px;
+        }
+
+        #box[data-layout="List"] .book-item {
+            width: 99%;
+            height: 80px;
+        }
+    </style>
 </head>
 <body>
-    <div class="content-section">
-        <div class="header">
-            <h1>Milestone 4 - Book Search</h1>
-            <div>
-                <a href="index.html">Home</a>
-            </div>
-        </div>
-        <div class="search-container" id="search-section">
-            <form id="search-form">
-                <input type="text" id="search-input" placeholder="Search for books...">
-                <button type="submit">Search</button>
-            </form>
-            <div class="view-switcher">
-                <button id="btnGrid">Grid View</button>
-                <button id="btnList">List View</button>
-                <button id="view-bookshelf">View Bookshelf</button>
-            </div>
-        </div>
-        <div id="box" class="book-list list-view"></div>
-        <div class="paging-controls"></div>
-        <div id="bookshelf-section" style="display:none;">
-            <h2>Bookshelf</h2>
-            <div id="bookshelf-list" class="book-list"></div>
-            <button id="view-search">Back to Search</button>
-        </div>
-        <div id="book-details-section" style="display:none;">
-            <button id="back-to-results">Back to Results</button>
-            <div id="book-details"></div>
-        </div>
+    <h1>Book Search App</h1>
+    <p>Click to switch layout: <a href="#" id="btnList">List View</a> | <a href="#" id="btnGrid">Grid View</a></p>
+    <div class="search-container" id="search-section">
+        <input type="text" id="search" placeholder="Search for books...">
+        <button id="search-btn">Search</button>
     </div>
+    <div id="book-list" data-layout="List"></div>
+    <div class="paging-controls"></div>
+    <div id="book-details-section">
+        <button id="back-to-search">Back to Search</button>
+        <div id="book-details"></div>
+    </div>
+    <div id="bookshelf-section">
+        <a href="#" id="home-link">Back to Search</a>
+        <div id="bookshelf-list"></div>
+    </div>
+    <a href="#" id="bookshelf-link">View Bookshelf</a>
 </body>
 </html>
