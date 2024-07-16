@@ -39,12 +39,15 @@
         }
         .search-container {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            align-items: center;
             margin-bottom: 20px;
         }
         .search-container form {
             display: flex;
             flex: 1;
+            max-width: 600px;
+            margin-bottom: 10px;
         }
         .search-container input {
             padding: 10px;
@@ -53,6 +56,7 @@
             border: 1px solid #555;
             background-color: #333;
             color: #e0e0e0;
+            flex: 1;
         }
         .search-container button {
             padding: 10px 20px;
@@ -65,29 +69,56 @@
         .search-container button:hover {
             background-color: #0b2e53; /* Slightly darker blue */
         }
-        .book-list {
-            list-style: none;
-            padding: 0;
+        .view-switcher {
             display: flex;
-            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
         }
-        .book-item {
+        .view-switcher button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #0e3a6f; /* Ravenclaw blue */
+            border: none;
+            color: #1a1a1a; /* Dark background */
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .view-switcher button:hover {
+            background-color: #0b2e53; /* Slightly darker blue */
+        }
+        #box {
+            display: flex; 
+            flex-wrap: wrap;
+            border: 3px solid red;
+            width: 100%;
+        }
+        .boxitem {
+            border: thin solid blue;
+            background-color: #ffeecc;
+            width: 99%;
+            margin: 0.3%;
+            height: 80px;
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
             padding: 10px;
-            background-color: #333;
-            border-radius: 5px;
-            width: calc(33.333% - 20px);
-            margin-right: 20px;
         }
-        .book-item h3 {
-            margin: 0 0 10px;
+        .boxitem img {
+            max-width: 50px;
+            margin-right: 10px;
+        }
+        .boxitem h3 {
+            margin: 0 0 5px;
             color: #0e3a6f; /* Ravenclaw blue */
         }
-        .book-item img {
-            max-width: 100px;
-            margin-right: 20px;
+        .boxitem p {
+            margin: 0;
+        }
+        .boxitem a {
+            color: #0e3a6f; /* Ravenclaw blue */
+            text-decoration: none;
+        }
+        .boxitem a:hover {
+            text-decoration: underline;
         }
         .paging-controls {
             margin-top: 20px;
@@ -123,40 +154,25 @@
         .paging-controls .ellipses {
             color: #d3d3d3;
         }
-        .grid-view .book-item {
-            width: calc(33.333% - 20px);
+        .grid-view .boxitem {
+            width: calc(24% - 0.6%);
+            height: 150px;
         }
-        .list-view .book-item {
-            width: 100%;
-        }
-        .view-switcher {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-        }
-        .view-switcher button {
-            margin-left: 10px;
-            padding: 5px 10px;
-            background-color: #0e3a6f; /* Ravenclaw blue */
-            border: none;
-            color: #1a1a1a; /* Dark background */
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .view-switcher button:hover {
-            background-color: #0b2e53; /* Slightly darker blue */
+        .list-view .boxitem {
+            width: 99%;
+            height: 80px;
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script>
     <script id="book-template" type="x-tmpl-mustache">
-        <li class="book-item">
+        <div class="boxitem">
             <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
             <div>
                 <h3><a href="#" class="book-title" data-book-id="{{id}}">{{volumeInfo.title}}</a></h3>
                 <p>{{volumeInfo.authors}}</p>
             </div>
-        </li>
+        </div>
     </script>
     <script>
         $(document).ready(function() {
@@ -269,7 +285,7 @@
                 $(".page-link").click(function() {
                     currentPage = $(this).data("page");
                     fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
-                        displayBooks(books, "#book-list");
+                        displayBooks(books, "#box");
                     });
                 });
 
@@ -277,7 +293,7 @@
                     if (currentPage > 1) {
                         currentPage--;
                         fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
-                            displayBooks(books, "#book-list");
+                            displayBooks(books, "#box");
                         });
                     }
                 });
@@ -286,7 +302,7 @@
                     if (currentPage < totalPages) {
                         currentPage++;
                         fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
-                            displayBooks(books, "#book-list");
+                            displayBooks(books, "#box");
                         });
                     }
                 });
@@ -300,21 +316,21 @@
                 if (currentQuery) {
                     currentPage = 1;
                     fetchBooks(currentQuery, 0, function(books) {
-                        displayBooks(books, "#book-list");
+                        displayBooks(books, "#box");
                     });
                 } else {
                     alert('Please enter a search query.');
                 }
             });
 
-            $("#view-grid").click(function() {
+            $("#btnGrid").click(function () {
                 currentView = 'grid-view';
-                $("#book-list").removeClass('list-view').addClass('grid-view');
+                $("#box").removeClass('list-view').addClass('grid-view');
             });
 
-            $("#view-list").click(function() {
+            $("#btnList").click(function () {
                 currentView = 'list-view';
-                $("#book-list").removeClass('grid-view').addClass('list-view');
+                $("#box").removeClass('grid-view').addClass('list-view');
             });
 
             $("#view-bookshelf").click(function() {
@@ -338,7 +354,7 @@
             });
 
             // Initial load
-            $("#book-list").addClass(currentView);
+            $("#box").addClass(currentView);
         });
     </script>
 </head>
@@ -356,16 +372,16 @@
                 <button type="submit">Search</button>
             </form>
             <div class="view-switcher">
-                <button id="view-grid">Grid View</button>
-                <button id="view-list">List View</button>
+                <button id="btnGrid">Grid View</button>
+                <button id="btnList">List View</button>
                 <button id="view-bookshelf">View Bookshelf</button>
             </div>
         </div>
-        <ul id="book-list" class="book-list list-view"></ul>
+        <div id="box" class="book-list list-view"></div>
         <div class="paging-controls"></div>
         <div id="bookshelf-section" style="display:none;">
             <h2>Bookshelf</h2>
-            <ul id="bookshelf-list" class="book-list"></ul>
+            <div id="bookshelf-list" class="book-list"></div>
             <button id="view-search">Back to Search</button>
         </div>
         <div id="book-details-section" style="display:none;">
