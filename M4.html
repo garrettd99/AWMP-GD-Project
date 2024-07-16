@@ -42,6 +42,29 @@
             justify-content: space-between;
             margin-bottom: 20px;
         }
+        .search-container form {
+            display: flex;
+            flex: 1;
+        }
+        .search-container input {
+            padding: 10px;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #e0e0e0;
+        }
+        .search-container button {
+            padding: 10px 20px;
+            background-color: #0e3a6f; /* Ravenclaw blue */
+            border: none;
+            color: #1a1a1a; /* Dark background */
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .search-container button:hover {
+            background-color: #0b2e53; /* Slightly darker blue */
+        }
         .book-list {
             list-style: none;
             padding: 0;
@@ -151,6 +174,8 @@
                     totalPages = Math.ceil(totalItems / itemsPerPage);
                     callback(data.items);
                     updatePagination();
+                }).fail(function() {
+                    alert('Failed to fetch books. Please try again.');
                 });
             }
 
@@ -158,6 +183,8 @@
                 const url = `https://www.googleapis.com/books/v1/volumes/${bookId}`;
                 $.getJSON(url, function(data) {
                     callback(data);
+                }).fail(function() {
+                    alert('Failed to fetch book details. Please try again.');
                 });
             }
 
@@ -169,6 +196,8 @@
                     } else {
                         $("#bookshelf-list").html("<p>No books found in the bookshelf.</p>");
                     }
+                }).fail(function() {
+                    alert('Failed to fetch bookshelf data. Please try again.');
                 });
             }
 
@@ -219,8 +248,11 @@
                 }
 
                 for (let i = startPage; i <= endPage; i++) {
-                    const pageLink = `<a href="#" class="page-link" data-page="${i}">${i}</a>`;
-                    $(".paging-controls").append(pageLink);
+                    if (i === currentPage) {
+                        $(".paging-controls").append(`<button class="page-link active-page" data-page="${i}">${i}</button>`);
+                    } else {
+                        $(".paging-controls").append(`<button class="page-link" data-page="${i}">${i}</button>`);
+                    }
                 }
 
                 if (endPage < totalPages) {
@@ -234,8 +266,7 @@
                     $(".paging-controls").append('<button class="next-page">Next</button>');
                 }
 
-                $(".page-link").click(function(e) {
-                    e.preventDefault();
+                $(".page-link").click(function() {
                     currentPage = $(this).data("page");
                     fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, function(books) {
                         displayBooks(books, "#book-list");
@@ -266,10 +297,14 @@
             $("#search-form").submit(function(e) {
                 e.preventDefault();
                 currentQuery = $("#search-input").val();
-                currentPage = 1;
-                fetchBooks(currentQuery, 0, function(books) {
-                    displayBooks(books, "#book-list");
-                });
+                if (currentQuery) {
+                    currentPage = 1;
+                    fetchBooks(currentQuery, 0, function(books) {
+                        displayBooks(books, "#book-list");
+                    });
+                } else {
+                    alert('Please enter a search query.');
+                }
             });
 
             $("#view-grid").click(function() {
