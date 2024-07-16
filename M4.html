@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Milestone 4 - Book Search</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Assuming you have a separate CSS file -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script> <!-- Added Mustache.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script> <!-- Updated Mustache.js -->
     <script>
         $(document).ready(function() {
             let currentPage = 1;
@@ -14,7 +13,7 @@
             let totalPages = 0;
             const itemsPerPage = 10;
             let currentQuery = '';
-            
+
             const bookTemplate = `
                 {{#books}}
                 <div class="book-item">
@@ -26,7 +25,7 @@
                 </div>
                 {{/books}}
             `;
-            
+
             const bookDetailsTemplate = `
                 <h2>{{volumeInfo.title}}</h2>
                 <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
@@ -221,22 +220,20 @@
                 $(".book-item").css("width", "99%").css("height", "80px");
                 $("#box").attr("data-layout", "List");
             });
-
         });
     </script>
     <style>
-        /* Ravenclaw themed styles */
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-            color: #f0f0f0;
             background-color: #003b70; /* Dark blue background */
+            color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
         }
 
         h1 {
             color: #f0f0f0;
-            border-bottom: 2px solid #0f4c81; /* Light blue underline */
+            border-bottom: 2px solid #0056a0; /* Dark blue underline */
         }
 
         #search-section, #book-details-section, #bookshelf-section {
@@ -254,13 +251,13 @@
         .search-container input {
             padding: 10px;
             width: 300px;
-            border: 2px solid #0f4c81;
+            border: 2px solid #0056a0;
             border-radius: 5px;
         }
 
         .search-container button {
             padding: 10px 20px;
-            background-color: #0f4c81;
+            background-color: #0056a0;
             color: #fff;
             border: none;
             border-radius: 5px;
@@ -268,7 +265,7 @@
         }
 
         .search-container button:hover {
-            background-color: #0a2c61;
+            background-color: #003b70;
         }
 
         #book-list {
@@ -278,7 +275,7 @@
         .book-item {
             display: flex;
             margin-bottom: 10px;
-            background-color: #0f4c81;
+            background-color: #004080;
             padding: 10px;
             border-radius: 5px;
             color: #fff;
@@ -298,7 +295,7 @@
         }
 
         #bookshelf-list .book-item {
-            background-color: #0056a0;
+            background-color: #003366;
         }
 
         .paging-controls {
@@ -307,7 +304,7 @@
 
         .page-link, .prev-page, .next-page {
             padding: 5px 10px;
-            background-color: #0f4c81;
+            background-color: #0056a0;
             color: #fff;
             border: none;
             border-radius: 5px;
@@ -322,21 +319,21 @@
         .ellipses {
             display: inline-block;
             padding: 5px 10px;
-            background-color: #0f4c81;
+            background-color: #0056a0;
             color: #fff;
             border-radius: 5px;
             cursor: pointer;
         }
 
         .prev-page:hover, .next-page:hover {
-            background-color: #0a2c61;
+            background-color: #003b70;
         }
 
         /* Grid and List view styles */
         #box {
             display: flex;
             flex-wrap: wrap;
-            border: 3px solid #0f4c81; /* Light blue border */
+            border: 3px solid #0056a0; /* Dark blue border */
             width: 100%;
         }
 
