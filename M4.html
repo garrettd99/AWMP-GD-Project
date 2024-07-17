@@ -149,11 +149,15 @@
             // Function to search books using Google Books API
             function searchBooks(query) {
                 $.ajax({
-                    url: `https://www.googleapis.com/books/v1/volumes?q=${query}`,
+                    url: `https://www.googleapis.com/books/v1/volumes?q=${query}&key=YOUR_API_KEY`, // Add your API key here
                     method: 'GET',
                     success: function(data) {
                         console.log("API Response:", data);  // Debugging API response structure
-                        displayBooks(data.items);
+                        if (data.items) {
+                            displayBooks(data.items);
+                        } else {
+                            $('#results').html('<p>No books found.</p>');
+                        }
                     },
                     error: function(error) {
                         console.log("Error fetching data", error);
