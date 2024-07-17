@@ -119,6 +119,9 @@
             {{#volumeInfo.imageLinks}}
             <img src="{{imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
             {{/volumeInfo.imageLinks}}
+            {{^volumeInfo.imageLinks}}
+            <img src="https://via.placeholder.com/128x192?text=No+Image" alt="No Image Available">
+            {{/volumeInfo.imageLinks}}
             <h3>{{volumeInfo.title}}</h3>
             <p>Authors: {{#volumeInfo.authors}}{{.}}{{^last}}, {{/last}}{{/volumeInfo.authors}}</p>
             <p>Publisher: {{volumeInfo.publisher}}</p>
