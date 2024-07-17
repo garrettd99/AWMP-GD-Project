@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Milestone 4 - Book Search</title>
     <!-- Link to CSS -->
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="styles.css">
     <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Include Mustache.js from CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script>
+    <!-- Include Mustache.js from the root folder -->
+    <script src="mustache.min.js"></script>
     <style>
         /* Ravenclaw themed styles */
         body {
@@ -48,6 +48,23 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
+        }
+        .search-container input {
+            padding: 10px;
+            border: 1px solid #f0c30f; /* Ravenclaw gold */
+            border-radius: 5px;
+            width: 70%;
+        }
+        .search-container button {
+            padding: 10px 15px;
+            background-color: #f0c30f; /* Ravenclaw gold */
+            border: none;
+            color: #0f4c75; /* Ravenclaw blue */
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .search-container button:hover {
+            background-color: #c9a30f; /* Slightly darker gold */
         }
         .book-list {
             list-style: none;
@@ -168,86 +185,63 @@
                 });
             }
 
-            // Fetch books from the user's bookshelf
-            function fetchBookshelf(callback) {
-                const url = `https://www.googleapis.com/books/v1/mylibrary/bookshelves/0/volumes`;
-                $.getJSON(url, function(data) {
-                    if (data.items) {
-                        callback(data.items);
-                    } else {
-                        $("#bookshelf-list").html("<p>No books found in the bookshelf.</p>");
-                    }
-                }).fail(function() {
-                    alert("Error fetching bookshelf. Please try again later.");
-                });
-            }
-
-            // Display books in the specified container
-            function displayBooks(books, container) {
-                $(container).empty();
-                let template = `
+            // Display books in the selected layout
+            function displayBooks(books) {
+                const template = `
                     {{#books}}
-                    <li class="book-item">
-                        <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
+                    <li class="book-item" data-id="{{id}}">
+                        <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}} thumbnail">
                         <div>
-                            <h3><a href="#" class="book-title" data-book-id="{{id}}">{{volumeInfo.title}}</a></h3>
+                            <h3>{{volumeInfo.title}}</h3>
                             <p>{{volumeInfo.authors}}</p>
-                            <p>{{volumeInfo.publishedDate}}</p>
                         </div>
                     </li>
                     {{/books}}
                 `;
                 const html = Mustache.render(template, { books: books });
-                $(container).html(html);
+                $('#book-list').html(html);
+            }
+
+            // Show book details in a separate section
+            function showBookDetails(book) {
+                const template = `
+                    <h2>{{volumeInfo.title}}</h2>
+                    <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}} thumbnail">
+                    <p><strong>Author(s):</strong> {{volumeInfo.authors}}</p>
+                    <p><strong>Published Date:</strong> {{volumeInfo.publishedDate}}</p>
+                    <p><strong>Description:</strong> {{volumeInfo.description}}</p>
+                    <p><strong>Publisher:</strong> {{volumeInfo.publisher}}</p>
+                    <p><strong>Page Count:</strong> {{volumeInfo.pageCount}}</p>
+                    <p><strong>Categories:</strong> {{volumeInfo.categories}}</p>
+                    <p><strong>Language:</strong> {{volumeInfo.language}}</p>
+                    <p><strong>Average Rating:</strong> {{volumeInfo.averageRating}}</p>
+                    <p><strong>Ratings Count:</strong> {{volumeInfo.ratingsCount}}</p>
+                `;
+                const html = Mustache.render(template, book);
+                $('#book-details').html(html);
+                $('#search-section').hide();
+                $('#book-details-section').show();
             }
 
             // Update pagination controls
             function updatePagination() {
-                const pagingControls = [];
-                pagingControls.push(`<a href="#" class="page-button ${currentPage === 1 ? 'active-page' : ''}" data-page="1">First</a>`);
-                if (currentPage > 1) {
-                    pagingControls.push(`<a href="#" class="page-button" data-page="${currentPage - 1}">Prev</a>`);
-                }
-                if (totalPages > 5) {
-                    if (currentPage > 3) {
-                        pagingControls.push(`<span class="ellipses">...</span>`);
+                let html = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === currentPage) {
+                        html += `<span class="paging-controls"><button class="active-page">${i}</button></span>`;
+                    } else {
+                        html += `<a href="#" class="paging-controls">${i}</a>`;
                     }
                 }
-                for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
-                    pagingControls.push(`<a href="#" class="page-button ${i === currentPage ? 'active-page' : ''}" data-page="${i}">${i}</a>`);
-                }
-                if (totalPages > 5) {
-                    if (currentPage < totalPages - 2) {
-                        pagingControls.push(`<span class="ellipses">...</span>`);
-                    }
-                }
-                if (totalPages > 1 && currentPage < totalPages) {
-                    pagingControls.push(`<a href="#" class="page-button" data-page="${currentPage + 1}">Next</a>`);
-                    pagingControls.push(`<a href="#" class="page-button" data-page="${totalPages}">Last</a>`);
-                }
-                $('.paging-controls').html(pagingControls.join(''));
+                $('.paging-controls').html(html);
             }
 
-            // Handle click events for page buttons
-            $(document).on('click', '.page-button', function(e) {
-                e.preventDefault();
-                const page = $(this).data('page');
-                if (page) {
-                    currentPage = page;
-                    const startIndex = (currentPage - 1) * itemsPerPage;
-                    fetchBooks(currentQuery, startIndex, function(books) {
-                        displayBooks(books, '#book-list');
-                        updatePagination();
-                    });
-                }
-            });
-
-            // Handle search button click
+            // Event listener for search button
             $('#search-btn').click(function() {
                 currentQuery = $('#search').val();
                 if (currentQuery) {
                     fetchBooks(currentQuery, 0, function(books) {
-                        displayBooks(books, '#book-list');
+                        displayBooks(books);
                         $('#search-section').show();
                         $('#book-details-section').hide();
                         $('#bookshelf-section').hide();
@@ -255,63 +249,49 @@
                 }
             });
 
-            // Handle search input Enter key press
-            $('#search').keypress(function(e) {
-                if (e.which === 13) {
-                    $('#search-btn').click();
-                }
+            // Event listener for grid view button
+            $('#btnGrid').click(function() {
+                currentLayout = 'Grid';
+                $('#book-list').addClass('grid-view');
             });
 
-            // Handle book title click
-            $(document).on('click', '.book-title', function(e) {
+            // Event listener for list view button
+            $('#btnList').click(function() {
+                currentLayout = 'List';
+                $('#book-list').removeClass('grid-view');
+            });
+
+            // Event listener for paging controls
+            $(document).on('click', '.paging-controls a', function(e) {
                 e.preventDefault();
-                const bookId = $(this).data('book-id');
+                currentPage = parseInt($(this).text());
+                fetchBooks(currentQuery, (currentPage - 1) * itemsPerPage, displayBooks);
+            });
+
+            // Event listener for book item click
+            $(document).on('click', '.book-item', function() {
+                const bookId = $(this).data('id');
                 fetchBookDetails(bookId, function(book) {
-                    $('#book-details').html(`
-                        <h2>${book.volumeInfo.title}</h2>
-                        <p><strong>Author:</strong> ${book.volumeInfo.authors.join(', ')}</p>
-                        <p><strong>Published Date:</strong> ${book.volumeInfo.publishedDate}</p>
-                        <p><strong>Description:</strong> ${book.volumeInfo.description || 'No description available.'}</p>
-                        <img src="${book.volumeInfo.imageLinks?.thumbnail}" alt="${book.volumeInfo.title}">
-                    `);
-                    $('#search-section').hide();
-                    $('#book-details-section').show();
-                    $('#bookshelf-section').hide();
+                    showBookDetails(book);
                 });
             });
 
-            // Handle back to search results button click
+            // Event listener for back to search results button
             $('#back-to-search').click(function() {
                 $('#search-section').show();
                 $('#book-details-section').hide();
-                $('#bookshelf-section').hide();
             });
 
-            // Handle Grid View button click
-            $('#btnGrid').click(function() {
-                currentLayout = 'Grid';
-                $('#book-list').removeClass('list-view').addClass('grid-view');
+            // Event listener for bookshelf link
+            $('#bookshelf-link').click(function() {
+                $('#search-section').hide();
+                $('#book-details-section').hide();
+                $('#bookshelf-section').show();
+                // Code to display books from the bookshelf goes here
             });
 
-            // Handle List View button click
-            $('#btnList').click(function() {
-                currentLayout = 'List';
-                $('#book-list').removeClass('grid-view').addClass('list-view');
-            });
-
-            // Handle Bookshelf link click
-            $('#bookshelf-link').click(function(e) {
-                e.preventDefault();
-                fetchBookshelf(function(books) {
-                    displayBooks(books, '#bookshelf-list');
-                    $('#search-section').hide();
-                    $('#book-details-section').hide();
-                    $('#bookshelf-section').show();
-                });
-            });
-
-            // Initial setup
-            $('#search').focus();
+            // Initialize search functionality on page load
+            fetchBooks('Harry Potter', 0, displayBooks);
         });
     </script>
 </body>
