@@ -6,7 +6,6 @@
     <title>Milestone 4 - Book Search</title>
     <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Include Mustache.js from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/mustache@4.2.0/mustache.min.js"></script>
     <style>
         /* Ravenclaw themed styles */
@@ -44,7 +43,8 @@
         }
         .search-section {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             margin-bottom: 20px;
         }
         .search-section input[type="text"] {
@@ -52,7 +52,7 @@
             width: 300px;
             border: 1px solid #f0c30f; /* Ravenclaw gold */
             border-radius: 5px;
-            margin-right: 10px;
+            margin-bottom: 10px;
         }
         .search-section button {
             padding: 10px 20px;
@@ -65,6 +65,21 @@
         .search-section button:hover {
             background-color: #d9a500; /* Darker gold for hover effect */
         }
+        .view-buttons {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .view-buttons a {
+            color: #f0c30f; /* Ravenclaw gold */
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #0f4c75; /* Ravenclaw blue */
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+        .view-buttons a:hover {
+            background-color: #083d57; /* Darker blue for hover effect */
+        }
         .results {
             display: flex;
             flex-wrap: wrap;
@@ -74,21 +89,17 @@
             background-color: #f0c30f; /* Ravenclaw gold */
             padding: 20px;
             border-radius: 5px;
-            width: calc(33.333% - 20px);
-            box-sizing: border-box;
-            cursor: pointer;
-        }
-        .results .book-item h3 {
-            margin-top: 0;
-            color: #0f4c75; /* Ravenclaw blue */
-        }
-        .results .book-item p {
-            margin: 10px 0;
-            color: #0f4c75; /* Ravenclaw blue */
+            width: 100%; /* Default to full width for List View */
         }
         .results .book-item img {
-            max-width: 100%; /* Ensure image fits within the container */
-            height: auto;    /* Maintain aspect ratio */
+            max-width: 100px;
+            height: auto;
+        }
+        .results.grid-view .book-item {
+            width: calc(33.333% - 20px); /* 3 items per row in Grid View */
+        }
+        .results.grid-view .book-item img {
+            max-width: 80px;
         }
     </style>
 </head>
@@ -107,6 +118,12 @@
             <input type="text" id="searchQuery" placeholder="Search for books...">
             <button id="searchButton">Search</button>
         </div>
+
+        <!-- View Switcher -->
+        <div class="view-buttons">
+            <a href="#" id="btnList">List View</a>
+            <a href="#" id="btnGrid">Grid View</a>
+        </div>
         
         <!-- Results section -->
         <div id="results" class="results"></div>
@@ -115,18 +132,14 @@
     <!-- Mustache.js Template -->
     <script id="book-template" type="x-tmpl-mustache">
         {{#books}}
-        <div class="book-item" data-info="{{infoLink}}">
-            {{#volumeInfo.imageLinks}}
-            <img src="{{imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
-            {{/volumeInfo.imageLinks}}
-            {{^volumeInfo.imageLinks}}
-            <img src="https://via.placeholder.com/128x192?text=No+Image" alt="No Image Available">
-            {{/volumeInfo.imageLinks}}
+        <div class="book-item">
+            <img src="{{#volumeInfo.imageLinks}}{{thumbnail}}{{/volumeInfo.imageLinks}}" alt="{{volumeInfo.title}}">
             <h3>{{volumeInfo.title}}</h3>
             <p>Authors: {{#volumeInfo.authors}}{{.}}{{^last}}, {{/last}}{{/volumeInfo.authors}}</p>
             <p>Publisher: {{volumeInfo.publisher}}</p>
             <p>Published Date: {{volumeInfo.publishedDate}}</p>
             <p>Page Count: {{volumeInfo.pageCount}}</p>
+            <a href="{{volumeInfo.infoLink}}" target="_blank">More Info</a>
         </div>
         {{/books}}
     </script>
@@ -139,25 +152,29 @@
             // Event listener for search button
             $('#searchButton').on('click', function() {
                 const query = $('#searchQuery').val();
-                if (query) { // Ensure there is a search query
-                    searchBooks(query);
-                } else {
-                    alert("Please enter a search query.");
-                }
+                searchBooks(query);
+            });
+
+            // Event listeners for view buttons
+            $('#btnGrid').on('click', function() {
+                $('#results').addClass('grid-view').removeClass('list-view');
+                $('#btnList').show();
+                $('#btnGrid').hide();
+            });
+
+            $('#btnList').on('click', function() {
+                $('#results').removeClass('grid-view').addClass('list-view');
+                $('#btnList').hide();
+                $('#btnGrid').show();
             });
 
             // Function to search books using Google Books API
             function searchBooks(query) {
                 $.ajax({
-                    url: `https://www.googleapis.com/books/v1/volumes?q=${query}&key=YOUR_API_KEY`, // Add your API key here
+                    url: `https://www.googleapis.com/books/v1/volumes?q=${query}`,
                     method: 'GET',
                     success: function(data) {
-                        console.log("API Response:", data);  // Debugging API response structure
-                        if (data.items) {
-                            displayBooks(data.items);
-                        } else {
-                            $('#results').html('<p>No books found.</p>');
-                        }
+                        displayBooks(data.items);
                     },
                     error: function(error) {
                         console.log("Error fetching data", error);
@@ -167,21 +184,22 @@
 
             // Function to display books using Mustache.js template
             function displayBooks(books) {
-                console.log("Books to display:", books);  // Debugging books data
                 const template = $('#book-template').html();
                 const rendered = Mustache.render(template, { books });
                 $('#results').html(rendered);
+
+                // Show/hide view buttons based on the current view
+                if ($('#results').hasClass('grid-view')) {
+                    $('#btnList').show();
+                    $('#btnGrid').hide();
+                } else {
+                    $('#btnList').hide();
+                    $('#btnGrid').show();
+                }
             }
 
-            // Event delegation to handle clicks on book items
-            $('#results').on('click', '.book-item', function() {
-                const bookInfoLink = $(this).data('info');
-                if (bookInfoLink) {
-                    window.open(bookInfoLink, '_blank');  // Open book details in a new tab
-                } else {
-                    console.log("No infoLink available for this book.");
-                }
-            });
+            // Initial setup: Start in List View
+            $('#btnList').hide();
         });
     </script>
 </body>
