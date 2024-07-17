@@ -129,46 +129,52 @@
     </script>
 
     <script>
-        // Debugging to check if Mustache is loaded correctly
-        console.log("Mustache:", Mustache);
+        $(document).ready(function() {
+            // Debugging to check if Mustache is loaded correctly
+            console.log("Mustache:", Mustache);
 
-        // Event listener for search button
-        $('#searchButton').on('click', function() {
-            const query = $('#searchQuery').val();
-            if (query) { // Ensure there is a search query
-                searchBooks(query);
-            } else {
-                alert("Please enter a search query.");
-            }
-        });
-
-        // Function to search books using Google Books API
-        function searchBooks(query) {
-            $.ajax({
-                url: `https://www.googleapis.com/books/v1/volumes?q=${query}`,
-                method: 'GET',
-                success: function(data) {
-                    displayBooks(data.items);
-                },
-                error: function(error) {
-                    console.log("Error fetching data", error);
+            // Event listener for search button
+            $('#searchButton').on('click', function() {
+                const query = $('#searchQuery').val();
+                if (query) { // Ensure there is a search query
+                    searchBooks(query);
+                } else {
+                    alert("Please enter a search query.");
                 }
             });
-        }
 
-        // Function to display books using Mustache.js template
-        function displayBooks(books) {
-            const template = $('#book-template').html();
-            const rendered = Mustache.render(template, { books });
-            $('#results').html(rendered);
-        }
-
-        // Event delegation to handle clicks on book items
-        $('#results').on('click', '.book-item', function() {
-            const bookInfoLink = $(this).data('info');
-            if (bookInfoLink) {
-                window.open(bookInfoLink, '_blank');  // Open book details in a new tab
+            // Function to search books using Google Books API
+            function searchBooks(query) {
+                $.ajax({
+                    url: `https://www.googleapis.com/books/v1/volumes?q=${query}`,
+                    method: 'GET',
+                    success: function(data) {
+                        console.log("API Response:", data);  // Debugging API response structure
+                        displayBooks(data.items);
+                    },
+                    error: function(error) {
+                        console.log("Error fetching data", error);
+                    }
+                });
             }
+
+            // Function to display books using Mustache.js template
+            function displayBooks(books) {
+                console.log("Books to display:", books);  // Debugging books data
+                const template = $('#book-template').html();
+                const rendered = Mustache.render(template, { books });
+                $('#results').html(rendered);
+            }
+
+            // Event delegation to handle clicks on book items
+            $('#results').on('click', '.book-item', function() {
+                const bookInfoLink = $(this).data('info');
+                if (bookInfoLink) {
+                    window.open(bookInfoLink, '_blank');  // Open book details in a new tab
+                } else {
+                    console.log("No infoLink available for this book.");
+                }
+            });
         });
     </script>
 </body>
