@@ -124,9 +124,23 @@
             <a href="#" id="btnList">List View</a>
             <a href="#" id="btnGrid">Grid View</a>
         </div>
-        
+
+        <!-- Link to Public Bookshelf -->
+        <div class="view-buttons">
+            <a href="#bookshelf" id="btnBookshelf">Go to Public Bookshelf</a>
+        </div>
+
         <!-- Results section -->
         <div id="results" class="results"></div>
+
+        <!-- Public Bookshelf Section -->
+        <div id="bookshelf" class="content-section" style="display:none;">
+            <h2>Public Bookshelf</h2>
+            <div class="view-buttons">
+                <a href="#results" id="btnBackToSearch">Back to Search</a>
+            </div>
+            <div id="bookshelfResults" class="results"></div>
+        </div>
     </div>
 
     <!-- Mustache.js Template -->
@@ -168,6 +182,22 @@
                 $('#btnGrid').show();
             });
 
+            // Event listener for bookshelf button
+            $('#btnBookshelf').on('click', function() {
+                $('#bookshelf').show();
+                $('#results').hide();
+                $('#btnBookshelf').hide();
+                $('#btnBackToSearch').show();
+            });
+
+            // Event listener for back to search button
+            $('#btnBackToSearch').on('click', function() {
+                $('#bookshelf').hide();
+                $('#results').show();
+                $('#btnBookshelf').show();
+                $('#btnBackToSearch').hide();
+            });
+
             // Function to search books using Google Books API
             function searchBooks(query) {
                 $.ajax({
@@ -198,8 +228,56 @@
                 }
             }
 
+            // Function to display bookshelf books
+            function displayBookshelf(books) {
+                const template = $('#book-template').html();
+                const rendered = Mustache.render(template, { books });
+                $('#bookshelfResults').html(rendered);
+
+                // Display bookshelf section
+                $('#bookshelf').show();
+                $('#results').hide();
+                $('#btnBookshelf').hide();
+                $('#btnBackToSearch').show();
+            }
+
+            // Example bookshelf data (replace with your own books)
+            const bookshelfBooks = [
+                {
+                    volumeInfo: {
+                        title: "Harry Potter and the Sorcerer's Stone",
+                        authors: ["J.K. Rowling"],
+                        publisher: "Scholastic",
+                        publishedDate: "1997-09-01",
+                        pageCount: 309,
+                        imageLinks: {
+                            thumbnail: "https://covers.openlibrary.org/b/id/8212276-L.jpg"
+                        },
+                        infoLink: "https://books.google.com/books?id=7zUwDwAAQBAJ"
+                    }
+                },
+                {
+                    volumeInfo: {
+                        title: "The Hobbit",
+                        authors: ["J.R.R. Tolkien"],
+                        publisher: "Houghton Mifflin",
+                        publishedDate: "1937-09-21",
+                        pageCount: 310,
+                        imageLinks: {
+                            thumbnail: "https://covers.openlibrary.org/b/id/354780-L.jpg"
+                        },
+                        infoLink: "https://books.google.com/books?id=RMi4QgAACAAJ"
+                    }
+                }
+                // Add more books here as needed
+            ];
+
+            // Initialize bookshelf with example data
+            displayBookshelf(bookshelfBooks);
+
             // Initial setup: Start in List View
             $('#btnList').hide();
+            $('#btnBackToSearch').hide();
         });
     </script>
 </body>
