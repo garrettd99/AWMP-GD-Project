@@ -42,204 +42,109 @@
         .header a:hover {
             background-color: #083d57; /* Darker blue for hover effect */
         }
-        .search-container {
+        .search-section {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             margin-bottom: 20px;
         }
-        .search-container input {
+        .search-section input[type="text"] {
             padding: 10px;
+            width: 300px;
             border: 1px solid #f0c30f; /* Ravenclaw gold */
             border-radius: 5px;
-            width: 70%;
+            margin-right: 10px;
         }
-        .search-container button {
-            padding: 10px 15px;
-            background-color: #f0c30f; /* Ravenclaw gold */
+        .search-section button {
+            padding: 10px 20px;
             border: none;
+            background-color: #f0c30f; /* Ravenclaw gold */
             color: #0f4c75; /* Ravenclaw blue */
             border-radius: 5px;
             cursor: pointer;
         }
-        .search-container button:hover {
-            background-color: #c9a30f; /* Slightly darker gold */
+        .search-section button:hover {
+            background-color: #d9a500; /* Darker gold for hover effect */
         }
-        .book-list {
-            list-style: none;
-            padding: 0;
-        }
-        .book-item {
+        .results {
             display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #1a1a1a;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .results .book-item {
+            background-color: #f0c30f; /* Ravenclaw gold */
+            padding: 20px;
             border-radius: 5px;
+            width: calc(33.333% - 20px);
         }
-        .book-item h3 {
-            margin: 0 0 10px;
-            color: #f0c30f; /* Ravenclaw gold */
-        }
-        .book-item img {
-            max-width: 100px;
-            margin-right: 20px;
-        }
-        .paging-controls {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .paging-controls button {
-            margin: 0 5px;
-            padding: 5px 10px;
-            background-color: #f0c30f; /* Ravenclaw gold */
-            border: none;
-            color: #0f4c75; /* Ravenclaw blue */
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .paging-controls button:hover {
-            background-color: #c9a30f; /* Slightly darker gold */
-        }
-        .paging-controls a {
-            color: #f0c30f; /* Ravenclaw gold */
-            text-decoration: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            background-color: #0f4c75; /* Ravenclaw blue */
-            margin: 0 5px;
-        }
-        .paging-controls a:hover {
-            background-color: #083d57; /* Darker blue for hover effect */
-        }
-        .paging-controls .active-page {
-            background-color: #f0c30f; /* Ravenclaw gold */
+        .results .book-item h3 {
+            margin-top: 0;
             color: #0f4c75; /* Ravenclaw blue */
         }
-        .paging-controls .ellipses {
-            color: #d3d3d3;
+        .results .book-item p {
+            margin: 10px 0;
+            color: #0f4c75; /* Ravenclaw blue */
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <a href="index.html">Home</a>
-        <a href="#" id="home-link">Book Search</a>
-        <a href="#" id="bookshelf-link">My Bookshelf</a>
-    </div>
     <div class="content-section">
-        <div id="search-section">
-            <!-- Search bar and button -->
-            <div class="search-container">
-                <input type="text" id="search" placeholder="Search for books...">
-                <button id="search-btn">Search</button>
-                <button id="btnGrid">Grid View</button>
-                <button id="btnList">List View</button>
-            </div>
-            <!-- Search results list -->
-            <ul id="book-list" class="book-list"></ul>
-            <!-- Paging controls -->
-            <div class="paging-controls"></div>
+        <!-- Header with navigation links -->
+        <div class="header">
+            <a href="M1.html">Milestone 1</a>
+            <a href="M2.html">Milestone 2</a>
+            <a href="M3.html">Milestone 3</a>
+            <a href="M4.html">Milestone 4</a>
         </div>
-        <div id="book-details-section" style="display: none;">
-            <!-- Book details section -->
-            <div id="book-details"></div>
-            <button id="back-to-search">Back to Search Results</button>
+        
+        <!-- Search section -->
+        <div class="search-section">
+            <input type="text" id="searchQuery" placeholder="Search for books...">
+            <button id="searchButton">Search</button>
         </div>
-        <div id="bookshelf-section" style="display: none;">
-            <!-- Bookshelf list -->
-            <ul id="bookshelf-list" class="book-list"></ul>
-        </div>
+        
+        <!-- Results section -->
+        <div id="results" class="results"></div>
     </div>
-    <!-- JavaScript -->
+
     <script>
-        $(document).ready(function() {
-            let currentPage = 1;
-            let totalItems = 0;
-            let totalPages = 0;
-            const itemsPerPage = 10;
-            let currentQuery = '';
-            let currentLayout = 'List';
+        // Debugging to check if Mustache is loaded correctly
+        console.log("Mustache:", Mustache);
 
-            // Fetch books from the Google Books API
-            function fetchBooks(query, startIndex, callback) {
-                const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${startIndex}&maxResults=${itemsPerPage}`;
-                $.getJSON(url, function(data) {
-                    totalItems = data.totalItems;
-                    totalPages = Math.ceil(totalItems / itemsPerPage);
-                    callback(data.items);
-                    updatePagination();
-                }).fail(function() {
-                    alert("Error fetching books. Please check your query or try again later.");
-                });
-            }
-
-            // Fetch book details from the Google Books API
-            function fetchBookDetails(bookId, callback) {
-                const url = `https://www.googleapis.com/books/v1/volumes/${bookId}`;
-                $.getJSON(url, function(data) {
-                    callback(data);
-                }).fail(function() {
-                    alert("Error fetching book details. Please try again later.");
-                });
-            }
-
-            // Display books in the selected layout
-            function displayBooks(books) {
-                const template = `
-                    {{#books}}
-                    <li class="book-item" data-id="{{id}}">
-                        <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}} thumbnail">
-                        <div>
-                            <h3>{{volumeInfo.title}}</h3>
-                            <p>{{volumeInfo.authors}}</p>
-                        </div>
-                    </li>
-                    {{/books}}
-                `;
-                const html = Mustache.render(template, { books: books });
-                $('#book-list').html(html);
-            }
-
-            // Event listeners for search button and pagination
-            $('#search-btn').click(function() {
-                currentQuery = $('#search').val();
-                currentPage = 1;
-                fetchBooks(currentQuery, 0, displayBooks);
-            });
-
-            // Event listeners for view toggle buttons
-            $("#btnGrid").click(function () {
-                $(".book-item").css("width", "24%").css("height", "150px");
-                currentLayout = "Grid";
-            });
-
-            $("#btnList").click(function () {
-                $(".book-item").css("width", "99%").css("height", "80px");
-                currentLayout = "List";
-            });
-
-            // Paging control events
-            $(document).on('click', '.page-link', function() {
-                currentPage = $(this).data('page');
-                const startIndex = (currentPage - 1) * itemsPerPage;
-                fetchBooks(currentQuery, startIndex, displayBooks);
-            });
-
-            // Back to search results button
-            $('#back-to-search').click(function() {
-                $('#book-details-section').hide();
-                $('#search-section').show();
-            });
-
-            // Function to update pagination controls
-            function updatePagination() {
-                let paginationHtml = '';
-                for (let i = 1; i <= totalPages; i++) {
-                    paginationHtml += `<a href="#" class="page-link" data-page="${i}">${i}</a> `;
-                }
-                $('.paging-controls').html(paginationHtml);
-            }
+        // Event listener for search button
+        $('#searchButton').on('click', function() {
+            const query = $('#searchQuery').val();
+            searchBooks(query);
         });
+
+        // Function to search books using Google Books API
+        function searchBooks(query) {
+            $.ajax({
+                url: `https://www.googleapis.com/books/v1/volumes?q=${query}`,
+                method: 'GET',
+                success: function(data) {
+                    displayBooks(data.items);
+                },
+                error: function(error) {
+                    console.log("Error fetching data", error);
+                }
+            });
+        }
+
+        // Function to display books using Mustache.js template
+        function displayBooks(books) {
+            const template = `
+                {{#books}}
+                <div class="book-item">
+                    <h3>{{volumeInfo.title}}</h3>
+                    <p>{{volumeInfo.authors}}</p>
+                    <p>{{volumeInfo.publisher}}</p>
+                </div>
+                {{/books}}
+            `;
+
+            const rendered = Mustache.render(template, { books });
+            $('#results').html(rendered);
+        }
     </script>
 </body>
 </html>
