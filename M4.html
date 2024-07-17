@@ -115,7 +115,7 @@
     <!-- Mustache.js Template -->
     <script id="book-template" type="x-tmpl-mustache">
         {{#books}}
-        <div class="book-item" data-id="{{id}}">
+        <div class="book-item" data-id="{{id}}" data-info="{{infoLink}}">
             {{#volumeInfo.imageLinks}}
             <img src="{{imageLinks.thumbnail}}" alt="{{volumeInfo.title}}" />
             {{/volumeInfo.imageLinks}}
@@ -165,9 +165,8 @@
 
         // Event delegation to handle clicks on book items
         $('#results').on('click', '.book-item', function() {
-            const bookId = $(this).data('id');
-            const url = `https://www.googleapis.com/books/v1/volumes/${bookId}`;
-            window.open(url, '_blank');  // Open book details in a new tab
+            const bookInfoLink = $(this).data('info');
+            window.open(bookInfoLink, '_blank');  // Open book details in a new tab
         });
     </script>
 </body>
