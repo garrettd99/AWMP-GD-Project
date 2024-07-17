@@ -117,7 +117,7 @@
         {{#books}}
         <div class="book-item" data-info="{{infoLink}}">
             {{#volumeInfo.imageLinks}}
-            <img src="{{imageLinks.thumbnail}}" alt="{{volumeInfo.title}}" />
+            <img src="{{imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
             {{/volumeInfo.imageLinks}}
             <h3>{{volumeInfo.title}}</h3>
             <p>Authors: {{#volumeInfo.authors}}{{.}}{{^last}}, {{/last}}{{/volumeInfo.authors}}</p>
